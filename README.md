@@ -4,7 +4,7 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 ## Statut
 
-🚧 En développement — pas encore fonctionnel.
+🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
 
 ## Contexte
 
@@ -32,7 +32,7 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/solar-panels/{id}`
 - `GET /api/erl`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
-- `GET /api/history/{timeScale}/{date}?zone=`
+- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` confirmé : `DAILY`. `zone` doit être un `ZoneOffset` Java au format compact **sans deux-points** (`+0200`, pas `+02:00`, pas de nom IANA type `Europe/Paris` — tout ça est rejeté avec 400). Renvoie productions/consommations du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
 - `POST /api/overview`
 
 Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un vrai compte (voir section Développement) — les réponses ne sont pas commitées (données personnelles) mais servent à valider le parsing des entités.

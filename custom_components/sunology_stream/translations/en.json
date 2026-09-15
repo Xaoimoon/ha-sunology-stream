@@ -35,6 +35,26 @@
       },
       "consumption_power": {
         "name": "Consumption power"
+      },
+      "grid_purchased_power": {
+        "name": "Grid purchased power"
+      },
+      "daily_production_energy": {
+        "name": "Daily production energy"
+      },
+      "daily_consumption_energy": {
+        "name": "Daily consumption energy"
+      },
+      "self_reliance": {
+        "name": "Self-reliance"
+      },
+      "erl_last_synchronization": {
+        "name": "ERL last synchronization"
+      }
+    },
+    "binary_sensor": {
+      "erl_connected": {
+        "name": "ERL connected"
       }
     }
   }
