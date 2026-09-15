@@ -3,6 +3,10 @@
   "name": "Sunology Stream",
   "codeowners": ["@Xaoimoon"],
   "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://brokk.xaoimoon.fr/xaoimoon/ha-sunology-stream",
+  "issue_tracker": "https://brokk.xaoimoon.fr/xaoimoon/ha-sunology-stream/issues",
+  "integration_type": "hub",
   "iot_class": "cloud_polling",
   "version": "0.1.0",
   "requirements": []

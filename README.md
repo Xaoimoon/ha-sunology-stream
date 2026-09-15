@@ -39,7 +39,15 @@ Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un 
 
 ## Installation
 
-Manuelle uniquement : copier `custom_components/sunology_stream` dans le dossier `custom_components` de votre installation Home Assistant. (Pas de HACS — ce dépôt est hébergé sur Forgejo, or HACS ne supporte que les dépôts GitHub, même en "dépôt personnalisé".)
+Manuelle uniquement (pas de HACS — ce dépôt est hébergé sur Forgejo, or HACS ne supporte que les dépôts GitHub, même en "dépôt personnalisé") :
+
+1. Repérer le dossier de configuration de votre installation Home Assistant (celui qui contient `configuration.yaml`).
+2. Y créer un dossier `custom_components` s'il n'existe pas déjà.
+3. Copier le dossier `custom_components/sunology_stream` de ce dépôt dedans, pour obtenir `<config>/custom_components/sunology_stream/`.
+4. Redémarrer Home Assistant (obligatoire — les intégrations custom ne sont chargées qu'au démarrage).
+5. **Paramètres > Appareils et services > Ajouter une intégration**, chercher "Sunology Stream", et se connecter avec son compte.
+
+Si l'intégration n'apparaît pas dans la recherche après redémarrage, vérifier les logs (**Paramètres > Système > Journaux**) pour une erreur de chargement — le cas le plus probable est une version de Home Assistant trop ancienne (l'intégration utilise le pattern `entry.runtime_data`, disponible depuis HA 2024.6).
 
 ## Développement
 
