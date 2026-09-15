@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -102,6 +103,18 @@ def main() -> int:
     show("erl", session.get(f"{BASE_URL}/erl", timeout=15))
     show("irradiance", session.get(f"{BASE_URL}/irradiance", timeout=15))
     show("irradiance-forecast", session.get(f"{BASE_URL}/irradiance-forecast", timeout=15))
+
+    # zone must be a compact ZoneOffset string ("+0200"), not "+02:00" or an
+    # IANA name — both are rejected. Discovered by trial and error.
+    now = datetime.now().astimezone()
+    show(
+        "history-daily",
+        session.get(
+            f"{BASE_URL}/history/DAILY/{now.strftime('%Y-%m-%d')}",
+            params={"zone": now.strftime("%z")},
+            timeout=15,
+        ),
+    )
 
     print(f"\nFixtures saved to {FIXTURES_DIR}")
     return 0

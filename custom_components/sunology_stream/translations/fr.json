@@ -35,6 +35,26 @@
       },
       "consumption_power": {
         "name": "Puissance de consommation"
+      },
+      "grid_purchased_power": {
+        "name": "Puissance achetée au réseau"
+      },
+      "daily_production_energy": {
+        "name": "Énergie produite du jour"
+      },
+      "daily_consumption_energy": {
+        "name": "Énergie consommée du jour"
+      },
+      "self_reliance": {
+        "name": "Taux d'autonomie"
+      },
+      "erl_last_synchronization": {
+        "name": "Dernière synchronisation ERL"
+      }
+    },
+    "binary_sensor": {
+      "erl_connected": {
+        "name": "ERL connecté"
       }
     }
   }

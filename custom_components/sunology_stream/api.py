@@ -18,6 +18,8 @@ from .const import (
     BASE_URL,
     CLIENT_ENDPOINT,
     ERL_ENDPOINT,
+    HISTORY_DAILY_SCALE,
+    HISTORY_ENDPOINT,
     LOGIN_ENDPOINT,
     LOGOUT_ENDPOINT,
     ME_ENDPOINT,
@@ -130,3 +132,15 @@ class SunologyStreamApiClient:
     async def get_erl(self) -> dict[str, Any]:
         """Return the ERL (Linky TIC reader) device status."""
         return await self._request("GET", ERL_ENDPOINT)  # type: ignore[return-value]
+
+    async def get_history_daily(self, date: str, zone: str) -> dict[str, Any]:
+        """Return the daily production/consumption history for a given date.
+
+        `date` must be "YYYY-MM-DD". `zone` must be a compact ZoneOffset
+        string like "+0200" (no colon — the API rejects "+02:00").
+        """
+        return await self._request(  # type: ignore[return-value]
+            "GET",
+            f"{HISTORY_ENDPOINT}/{HISTORY_DAILY_SCALE}/{date}",
+            params={"zone": zone},
+        )
