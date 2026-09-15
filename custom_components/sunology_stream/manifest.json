@@ -1,0 +1,8 @@
+{
+  "domain": "sunology_stream",
+  "name": "Sunology Stream",
+  "codeowners": ["@Xaoimoon"],
+  "config_flow": false,
+  "iot_class": "cloud_polling",
+  "requirements": []
+}
