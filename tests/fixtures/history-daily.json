@@ -1,0 +1,3486 @@
+{
+  "selfReliance": 36.0,
+  "productionHistory": {
+    "total": {
+      "wattValueSuffix": {
+        "value": 21287,
+        "displayed": 21.3,
+        "suffix": "kWh"
+      },
+      "currency": 4.57
+    },
+    "average": {
+      "wattValueSuffix": {
+        "value": 172,
+        "displayed": 172,
+        "suffix": "Wh"
+      },
+      "currency": 0.04
+    },
+    "data": [
+      {
+        "wattValueSuffix": {
+          "value": 23,
+          "displayed": 23,
+          "suffix": "Wh"
+        },
+        "currency": 0.01
+      },
+      {
+        "wattValueSuffix": {
+          "value": 7,
+          "displayed": 7,
+          "suffix": "Wh"
+        },
+        "currency": 0.01
+      },
+      {
+        "wattValueSuffix": {
+          "value": 0,
+          "displayed": 0,
+          "suffix": "Wh"
+        },
+        "currency": 0.0
+      }
+    ],
+    "dataBatteries": [
+      {
+        "wattValueSuffix": {
+          "value": 0,
+          "displayed": 0,
+          "suffix": "Wh"
+        },
+        "currency": 0.0
+      },
+      {
+        "wattValueSuffix": {
+          "value": 0,
+          "displayed": 0,
+          "suffix": "Wh"
+        },
+        "currency": 0.0
+      }
+    ],
+    "dataPerPanel": [
+      {
+        "name": "Sunology 1",
+        "valueKw": {
+          "value": 9454,
+          "displayed": 9.5,
+          "suffix": "kWh"
+        },
+        "valueCurrency": 2.03,
+        "type": "PLAY_MAX",
+        "prodData": [
+          {
+            "wattValueSuffix": {
+              "value": 11,
+              "displayed": 11,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 15,
+              "displayed": 15,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 32,
+              "displayed": 32,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 81,
+              "displayed": 81,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 203,
+              "displayed": 203,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 258,
+              "displayed": 258,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 229,
+              "displayed": 229,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 168,
+              "displayed": 168,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 126,
+              "displayed": 126,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 70,
+              "displayed": 70,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 20,
+              "displayed": 20,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 8,
+              "displayed": 8,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 16,
+              "displayed": 16,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 36,
+              "displayed": 36,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 86,
+              "displayed": 86,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 157,
+              "displayed": 157,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 184,
+              "displayed": 184,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 188,
+              "displayed": 188,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 188,
+              "displayed": 188,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 132,
+              "displayed": 132,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 71,
+              "displayed": 71,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 25,
+              "displayed": 25,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 16,
+              "displayed": 16,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 9,
+              "displayed": 9,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 20,
+              "displayed": 20,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 50,
+              "displayed": 50,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 45,
+              "displayed": 45,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 87,
+              "displayed": 87,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 74,
+              "displayed": 74,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 53,
+              "displayed": 53,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 124,
+              "displayed": 124,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 65,
+              "displayed": 65,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 30,
+              "displayed": 30,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 23,
+              "displayed": 23,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 4,
+              "displayed": 4,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 11,
+              "displayed": 11,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 29,
+              "displayed": 29,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 78,
+              "displayed": 78,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 201,
+              "displayed": 201,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 254,
+              "displayed": 254,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 234,
+              "displayed": 234,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 172,
+              "displayed": 172,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 122,
+              "displayed": 122,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 56,
+              "displayed": 56,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 14,
+              "displayed": 14,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 4,
+              "displayed": 4,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 15,
+              "displayed": 15,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 35,
+              "displayed": 35,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 55,
+              "displayed": 55,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 91,
+              "displayed": 91,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 196,
+              "displayed": 196,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 236,
+              "displayed": 236,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 172,
+              "displayed": 172,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 124,
+              "displayed": 124,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 55,
+              "displayed": 55,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 13,
+              "displayed": 13,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 13,
+              "displayed": 13,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 29,
+              "displayed": 29,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 74,
+              "displayed": 74,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 189,
+              "displayed": 189,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 240,
+              "displayed": 240,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 230,
+              "displayed": 230,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 170,
+              "displayed": 170,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 121,
+              "displayed": 121,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 52,
+              "displayed": 52,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 13,
+              "displayed": 13,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 12,
+              "displayed": 12,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 27,
+              "displayed": 27,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 72,
+              "displayed": 72,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 189,
+              "displayed": 189,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 238,
+              "displayed": 238,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 226,
+              "displayed": 226,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 166,
+              "displayed": 166,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 120,
+              "displayed": 120,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 48,
+              "displayed": 48,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 13,
+              "displayed": 13,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 4,
+              "displayed": 4,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 13,
+              "displayed": 13,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 33,
+              "displayed": 33,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 80,
+              "displayed": 80,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 196,
+              "displayed": 196,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 239,
+              "displayed": 239,
+              "suffix": "Wh"
+            },
+            "currency": 0.06
+          },
+          {
+            "wattValueSuffix": {
+              "value": 217,
+              "displayed": 217,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 156,
+              "displayed": 156,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 114,
+              "displayed": 114,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 43,
+              "displayed": 43,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 12,
+              "displayed": 12,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 12,
+              "displayed": 12,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 26,
+              "displayed": 26,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 67,
+              "displayed": 67,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 184,
+              "displayed": 184,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 231,
+              "displayed": 231,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 215,
+              "displayed": 215,
+              "suffix": "Wh"
+            },
+            "currency": 0.05
+          },
+          {
+            "wattValueSuffix": {
+              "value": 161,
+              "displayed": 161,
+              "suffix": "Wh"
+            },
+            "currency": 0.04
+          },
+          {
+            "wattValueSuffix": {
+              "value": 109,
+              "displayed": 109,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 42,
+              "displayed": 42,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 12,
+              "displayed": 12,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 2,
+              "displayed": 2,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          }
+        ],
+        "consoData": [
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 56,
+              "displayed": 56,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 113,
+              "displayed": 113,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 118,
+              "displayed": 118,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 63,
+              "displayed": 63,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 22,
+              "displayed": 22,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 44,
+              "displayed": 44,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 30,
+              "displayed": 30,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 71,
+              "displayed": 71,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 1,
+              "displayed": 1,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 106,
+              "displayed": 106,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 110,
+              "displayed": 110,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 115,
+              "displayed": 115,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 64,
+              "displayed": 64,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 3,
+              "displayed": 3,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 26,
+              "displayed": 26,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 108,
+              "displayed": 108,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 62,
+              "displayed": 62,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 57,
+              "displayed": 57,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 111,
+              "displayed": 111,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 116,
+              "displayed": 116,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 63,
+              "displayed": 63,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 59,
+              "displayed": 59,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 111,
+              "displayed": 111,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 117,
+              "displayed": 117,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 56,
+              "displayed": 56,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 76,
+              "displayed": 76,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          {
+            "wattValueSuffix": {
+              "value": 113,
+              "displayed": 113,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 117,
+              "displayed": 117,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 27,
+              "displayed": 27,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 43,
+              "displayed": 43,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 111,
+              "displayed": 111,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 116,
+              "displayed": 116,
+              "suffix": "Wh"
+            },
+            "currency": 0.03
+          },
+          {
+            "wattValueSuffix": {
+              "value": 16,
+              "displayed": 16,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          },
+          {
+            "wattValueSuffix": {
+              "value": 0,
+              "displayed": 0,
+              "suffix": "Wh"
+            },
+            "currency": 0.0
+          }
+        ],
+        "totalValues": {
+          "totalProd": {
+            "wattValueSuffix": {
+              "value": 9454,
+              "displayed": 9.5,
+              "suffix": "kWh"
+            },
+            "currency": 2.03
+          },
+          "averageProd": {
+            "wattValueSuffix": {
+              "value": 82,
+              "displayed": 82,
+              "suffix": "Wh"
+            },
+            "currency": 0.02
+          },
+          "totalConso": {
+            "wattValueSuffix": {
+              "value": 2408,
+              "displayed": 2.5,
+              "suffix": "kWh"
+            },
+            "currency": 0.52
+          },
+          "averageConso": {
+            "wattValueSuffix": {
+              "value": 21,
+              "displayed": 21,
+              "suffix": "Wh"
+            },
+            "currency": 0.01
+          }
+        },
+        "translatableName": null
+      }
+    ],
+    "transferToBattery": {
+      "wattValueSuffix": {
+        "value": 2389,
+        "displayed": 2.4,
+        "suffix": "kWh"
+      },
+      "currency": 0.52
+    },
+    "transferToBatteryPercent": 12
+  },
+  "consumptionHistory": {
+    "total": {
+      "wattValueSuffix": {
+        "value": 38562,
+        "displayed": 38.6,
+        "suffix": "kWh"
+      },
+      "currency": 8.28
+    },
+    "average": {
+      "wattValueSuffix": {
+        "value": 1607,
+        "displayed": 1.7,
+        "suffix": "kWh"
+      },
+      "currency": 0.35
+    },
+    "data": [
+      {
+        "wattValueSuffix": {
+          "value": 4124,
+          "displayed": 4.2,
+          "suffix": "kWh"
+        },
+        "currency": 0.89
+      },
+      {
+        "wattValueSuffix": {
+          "value": 2701,
+          "displayed": 2.8,
+          "suffix": "kWh"
+        },
+        "currency": 0.58
+      },
+      {
+        "wattValueSuffix": {
+          "value": 3857,
+          "displayed": 3.9,
+          "suffix": "kWh"
+        },
+        "currency": 0.83
+      }
+    ],
+    "dataBatteries": null,
+    "totalConsumptionInW": 38562,
+    "wattSoldTotal": null,
+    "selfConsoRatio": 0,
+    "soldTotal": null,
+    "selfConsoTotal": null,
+    "completeConsoTotal": {
+      "wattValueSuffix": {
+        "value": 38562,
+        "displayed": 38.6,
+        "suffix": "kWh"
+      },
+      "currency": 8.28
+    },
+    "soldData": null,
+    "selfConsoDatas": null,
+    "sellBack": false
+  },
+  "storageHistory": null,
+  "consumptionDevicesHistory": null,
+  "canMeasureProduction": true,
+  "hasGridMeter": false
+}

@@ -1,0 +1,43 @@
+{
+  "production": {
+    "total": 0,
+    "panels": {
+      "AAAAAAAAAAAA": {
+        "surname": "Sunology 1",
+        "production": 0,
+        "battery": 2,
+        "has_b": true,
+        "deviceState": "CONNECTED",
+        "batteryState": "DISCHARGING",
+        "panelType": "PLAY_MAX",
+        "productionPerPhase": null
+      },
+      "BBBBBBBBBBBB": {
+        "surname": "Sunology 2",
+        "production": 0,
+        "battery": 0,
+        "has_b": false,
+        "deviceState": "CONNECTED",
+        "batteryState": "UNPLUGGED",
+        "panelType": "PLAY_MAX",
+        "productionPerPhase": null
+      }
+    },
+    "meters": {}
+  },
+  "consumptionData": {
+    "total": 4088.0,
+    "purchased": 4088.0,
+    "sold": null,
+    "deviceState": "CONNECTED",
+    "deviceType": "ERL",
+    "isSellBack": false,
+    "totalDevicesConsumption": 0,
+    "consumptionPerDevice": []
+  },
+  "storageData": {
+    "total": 0,
+    "storageBatteries": {}
+  },
+  "hubData": []
+}

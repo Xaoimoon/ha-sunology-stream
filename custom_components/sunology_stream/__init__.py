@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SunologyStreamConfigEntr
         await api.close()
         raise ConfigEntryNotReady(f"Cannot reach Sunology Stream API: {err}") from err
 
-    coordinator = SunologyStreamDataUpdateCoordinator(hass, api)
+    coordinator = SunologyStreamDataUpdateCoordinator(hass, entry, api)
     try:
         await coordinator.async_config_entry_first_refresh()
     except Exception:
