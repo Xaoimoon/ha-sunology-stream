@@ -103,9 +103,9 @@ class SunologyStreamApiClient:
                 f"Unexpected status {response.status} for {method} {endpoint}"
             )
 
-        if response.status == 204 or not response.content_length:
+        if response.status == 204:
             return None
-        return await response.json()
+        return await response.json(content_type=None)
 
     async def get_me(self) -> dict[str, Any]:
         """Return the current user's profile. Also used as a session check."""
