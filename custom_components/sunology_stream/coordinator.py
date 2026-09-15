@@ -6,6 +6,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -39,10 +40,13 @@ class SunologyStreamData:
 class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamData]):
     """Coordinates polling of the Sunology Stream cloud API."""
 
-    def __init__(self, hass: HomeAssistant, api: SunologyStreamApiClient) -> None:
+    def __init__(
+        self, hass: HomeAssistant, config_entry: ConfigEntry, api: SunologyStreamApiClient
+    ) -> None:
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=config_entry,
             name=DOMAIN,
             update_interval=DEFAULT_SCAN_INTERVAL,
         )

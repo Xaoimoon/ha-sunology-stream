@@ -39,7 +39,7 @@ Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un 
 
 ## Installation
 
-Pas encore prêt pour une installation via HACS ou manuelle. Copier `custom_components/sunology_stream` dans le dossier `custom_components` de votre installation Home Assistant une fois l'intégration fonctionnelle.
+Manuelle uniquement : copier `custom_components/sunology_stream` dans le dossier `custom_components` de votre installation Home Assistant. (Pas de HACS — ce dépôt est hébergé sur Forgejo, or HACS ne supporte que les dépôts GitHub, même en "dépôt personnalisé".)
 
 ## Développement
 
@@ -57,6 +57,14 @@ python scripts/probe.py
 ```
 
 Les réponses sont sauvegardées dans `dev/fixtures/` (gitignored, contient des données personnelles).
+
+### Tests
+
+```bash
+scripts/test
+```
+
+Suite pytest ciblée (pas de couverture exhaustive façon HA core) : `api.py` (logique HTTP/retry/erreurs, mockée avec `aioresponses`, aucun appel réseau réel) et l'extraction de données du coordinator/sensor, testée contre des fixtures réelles anonymisées (`tests/fixtures/`, dérivées de captures `scripts/probe.py` avec les données personnelles retirées). Pas de tests sur `config_flow.py` — nécessiterait `pytest-homeassistant-custom-component`, jugé disproportionné pour ce projet (la version actuelle de ludeeus/integration_blueprint a d'ailleurs abandonné cette approche).
 
 ## Avertissement
 

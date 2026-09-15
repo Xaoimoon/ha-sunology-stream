@@ -1,0 +1,4 @@
+-r requirements_dev.txt
+pytest==8.4.2
+pytest-asyncio==1.2.0
+aioresponses==0.7.9
