@@ -16,8 +16,9 @@ Authentification par cookie de session (pas de token Bearer).
 
 - `POST /api/login-post` — body `{"username": "<email>", "password": "<mot de passe>"}`
 - `POST /api/logout`
-- `GET /api/users/me` — profil de l'utilisateur connecté
-- `GET /api/users/authenticated` — vérifie si la session est active
+- `GET /api/users/me` — profil de l'utilisateur connecté (sert aussi de vérification de session)
+
+`/api/users/authenticated`, référencé dans le code JS de l'appli, n'existe pas côté serveur (404 confirmé).
 
 Base URL : `https://backend-mobile.stream.sunology.eu`
 
@@ -34,11 +35,28 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/history/{timeScale}/{date}?zone=`
 - `POST /api/overview`
 
-Le format exact des réponses JSON n'a pas encore été observé en clair — à documenter au fur et à mesure de l'implémentation.
+Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un vrai compte (voir section Développement) — les réponses ne sont pas commitées (données personnelles) mais servent à valider le parsing des entités.
 
 ## Installation
 
 Pas encore prêt pour une installation via HACS ou manuelle. Copier `custom_components/sunology_stream` dans le dossier `custom_components` de votre installation Home Assistant une fois l'intégration fonctionnelle.
+
+## Développement
+
+Un devcontainer VS Code est fourni (inspiré de [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint), le modèle de référence pour le développement d'intégrations HA custom) :
+
+1. Ouvrir le repo dans VS Code avec l'extension **Dev Containers**, puis "Reopen in Container" (installe `homeassistant` + dépendances via `scripts/setup`).
+2. Lancer `scripts/develop` — crée un dossier `config/` de dev (gitignored) et démarre Home Assistant avec l'intégration chargée, sur `http://localhost:8123`.
+3. Compléter le config flow avec un vrai compte Sunology Stream depuis l'UI.
+
+Pour capturer/rafraîchir les vraies formes de réponse API (hors HA, script autonome) :
+
+```bash
+cp .env.example .env   # renseigner SUNOLOGY_USERNAME / SUNOLOGY_PASSWORD
+python scripts/probe.py
+```
+
+Les réponses sont sauvegardées dans `dev/fixtures/` (gitignored, contient des données personnelles).
 
 ## Avertissement
 
