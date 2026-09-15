@@ -1,0 +1,41 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Sunology Stream",
+        "description": "Enter your Sunology Stream account credentials.",
+        "data": {
+          "username": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthentication required",
+        "description": "Your Sunology Stream session has expired. Please log in again.",
+        "data": {
+          "username": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid credentials",
+      "cannot_connect": "Could not reach the Sunology Stream API",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Reauthentication successful"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "production_power": {
+        "name": "Production power"
+      },
+      "consumption_power": {
+        "name": "Consumption power"
+      }
+    }
+  }
+}

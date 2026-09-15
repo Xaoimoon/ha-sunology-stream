@@ -1,0 +1,41 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connexion à Sunology Stream",
+        "description": "Entrez les identifiants de votre compte Sunology Stream.",
+        "data": {
+          "username": "E-mail",
+          "password": "Mot de passe"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ré-authentification requise",
+        "description": "Votre session Sunology Stream a expiré. Reconnectez-vous.",
+        "data": {
+          "username": "E-mail",
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Identifiants invalides",
+      "cannot_connect": "Impossible de contacter l'API Sunology Stream",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "Ce compte est déjà configuré",
+      "reauth_successful": "Ré-authentification réussie"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "production_power": {
+        "name": "Puissance de production"
+      },
+      "consumption_power": {
+        "name": "Puissance de consommation"
+      }
+    }
+  }
+}
