@@ -9,3 +9,4 @@ venv/
 .env
 dev/fixtures/
 config/
+release_notes.md

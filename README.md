@@ -74,6 +74,23 @@ scripts/test
 
 Suite pytest ciblée (pas de couverture exhaustive façon HA core) : `api.py` (logique HTTP/retry/erreurs, mockée avec `aioresponses`, aucun appel réseau réel) et l'extraction de données du coordinator/sensor, testée contre des fixtures réelles anonymisées (`tests/fixtures/`, dérivées de captures `scripts/probe.py` avec les données personnelles retirées). Pas de tests sur `config_flow.py` — nécessiterait `pytest-homeassistant-custom-component`, jugé disproportionné pour ce projet (la version actuelle de ludeeus/integration_blueprint a d'ailleurs abandonné cette approche).
 
+### Releases
+
+Le versioning (`manifest.json`) suit [SemVer](https://semver.org/) et est bumpé automatiquement par `.forgejo/workflows/release.yml` à chaque push sur `main`, à partir des messages de commit [Conventional Commits](https://www.conventionalcommits.org/) :
+
+- `feat: ...` → minor
+- `fix: ...` / `perf: ...` → patch
+- `BREAKING CHANGE:` en pied de message, ou `!` avant le `:` (ex. `feat!: ...`) → major
+- tout le reste (`docs:`, `chore:`, `refactor:`, `test:`, ...) ne déclenche pas de release
+
+Le workflow calcule la version suivante (`scripts/bump_version.py`), met à jour `manifest.json`, commit (`chore(release): vX.Y.Z`, avec un garde-fou pour ne pas se re-déclencher lui-même), tag, et crée une release Forgejo via l'API (`scripts/create_release.py`). Prérequis côté instance : un runner Forgejo Actions enregistré, avec le token par défaut autorisé en écriture sur le dépôt (`permissions: contents: write`).
+
+Prévisualiser la prochaine version sans rien modifier :
+
+```bash
+python scripts/bump_version.py --dry-run
+```
+
 ## Avertissement
 
 Projet non affilié à Sunology. Basé sur une API non documentée susceptible de changer sans préavis.
