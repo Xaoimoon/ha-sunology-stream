@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+# Requires a Forgejo Actions runner registered for this repo/org, and the
+# default ACTIONS_RUNTIME_TOKEN (exposed here as secrets.GITHUB_TOKEN for
+# Actions compatibility) to have write access to contents + releases.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # Guards against the release commit this job pushes re-triggering itself.
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Compute next version
+        id: bump
+        run: python3 scripts/bump_version.py --github-output "$GITHUB_OUTPUT"
+
+      - name: Commit, tag and push
+        if: steps.bump.outputs.should_release == 'true'
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+          TAG: ${{ steps.bump.outputs.tag }}
+        run: |
+          git config user.name "Forgejo Actions"
+          git config user.email "actions@brokk.xaoimoon.fr"
+          git add custom_components/sunology_stream/manifest.json
+          git commit -m "chore(release): v${VERSION} [skip ci]"
+          git tag "${TAG}"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@brokk.xaoimoon.fr/xaoimoon/ha-sunology-stream.git"
+          git push origin HEAD:main
+          git push origin "${TAG}"
+
+      - name: Create Forgejo release
+        if: steps.bump.outputs.should_release == 'true'
+        env:
+          TAG: ${{ steps.bump.outputs.tag }}
+        run: |
+          python3 scripts/create_release.py \
+            --server https://brokk.xaoimoon.fr \
+            --repo xaoimoon/ha-sunology-stream \
+            --token "${{ secrets.GITHUB_TOKEN }}" \
+            --tag "${TAG}" \
+            --notes-file release_notes.md
