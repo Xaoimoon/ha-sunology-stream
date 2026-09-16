@@ -20,9 +20,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
+      # actions/setup-python fetches prebuilt binaries from actions/python-versions,
+      # which doesn't reliably publish linux-arm64 builds for every version — the
+      # runner here is arm64. The scripts only need stdlib, so a plain apt install
+      # of whatever python3 Debian bullseye ships is enough and works on any arch.
+      - name: Install Python
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3
 
       - name: Compute next version
         id: bump
