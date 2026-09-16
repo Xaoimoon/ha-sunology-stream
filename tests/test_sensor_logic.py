@@ -89,3 +89,11 @@ def test_panel_production_values(sample_data: SunologyStreamData):
     assert set(panels.keys()) == {"AAAAAAAAAAAA", "BBBBBBBBBBBB"}
     assert panels["AAAAAAAAAAAA"]["production"] == 0
     assert panels["AAAAAAAAAAAA"]["surname"] == "Sunology 1"
+
+
+def test_panel_battery_values(sample_data: SunologyStreamData):
+    panels = sample_data.overview["production"]["panels"]
+    assert panels["AAAAAAAAAAAA"]["battery"] == 2
+    assert panels["AAAAAAAAAAAA"]["batteryState"] == "DISCHARGING"
+    assert panels["BBBBBBBBBBBB"]["battery"] == 0
+    assert panels["BBBBBBBBBBBB"]["batteryState"] == "UNPLUGGED"

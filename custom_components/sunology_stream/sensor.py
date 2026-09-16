@@ -118,7 +118,12 @@ async def async_setup_entry(
     """Set up Sunology Stream sensors from a config entry."""
     coordinator = entry.runtime_data.coordinator
 
-    entities: list[SunologyStreamSensor | SunologyStreamPanelProductionSensor] = [
+    entities: list[
+        SunologyStreamSensor
+        | SunologyStreamPanelProductionSensor
+        | SunologyStreamPanelBatteryLevelSensor
+        | SunologyStreamPanelBatteryStateSensor
+    ] = [
         SunologyStreamSensor(coordinator, entry.entry_id, description)
         for description in SENSOR_DESCRIPTIONS
     ]
@@ -133,9 +138,20 @@ async def async_setup_entry(
     # this config entry to show up — acceptable for now.
     panels = coordinator.data.overview.get("production", {}).get("panels", {})
     for serial_number, panel_data in panels.items():
+        surname = panel_data.get("surname")
         entities.append(
             SunologyStreamPanelProductionSensor(
-                coordinator, entry.entry_id, serial_number, panel_data.get("surname")
+                coordinator, entry.entry_id, serial_number, surname
+            )
+        )
+        entities.append(
+            SunologyStreamPanelBatteryLevelSensor(
+                coordinator, entry.entry_id, serial_number, surname
+            )
+        )
+        entities.append(
+            SunologyStreamPanelBatteryStateSensor(
+                coordinator, entry.entry_id, serial_number, surname
             )
         )
 
@@ -192,3 +208,63 @@ class SunologyStreamPanelProductionSensor(
         panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
         panel = panels.get(self._serial_number, {})
         return panel.get("production")
+
+
+class SunologyStreamPanelBatteryLevelSensor(
+    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
+):
+    """State of charge for a panel's integrated battery (0 for panels without one)."""
+
+    _attr_has_entity_name = True
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(
+        self,
+        coordinator: SunologyStreamDataUpdateCoordinator,
+        entry_id: str,
+        serial_number: str,
+        surname: str | None,
+    ) -> None:
+        super().__init__(coordinator)
+        self._serial_number = serial_number
+        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_level"
+        self._attr_name = f"{surname or serial_number} battery level"
+
+    @property
+    def native_value(self) -> Any:
+        panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
+        panel = panels.get(self._serial_number, {})
+        return panel.get("battery")
+
+
+class SunologyStreamPanelBatteryStateSensor(
+    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
+):
+    """Raw charge/discharge state for a panel's integrated battery.
+
+    Exposed as a plain string (not device_class enum) since the full set of
+    values the API can return isn't confirmed yet — only "OFF",
+    "DISCHARGING" and "UNPLUGGED" have been observed.
+    """
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: SunologyStreamDataUpdateCoordinator,
+        entry_id: str,
+        serial_number: str,
+        surname: str | None,
+    ) -> None:
+        super().__init__(coordinator)
+        self._serial_number = serial_number
+        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_state"
+        self._attr_name = f"{surname or serial_number} battery state"
+
+    @property
+    def native_value(self) -> Any:
+        panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
+        panel = panels.get(self._serial_number, {})
+        return panel.get("batteryState")
