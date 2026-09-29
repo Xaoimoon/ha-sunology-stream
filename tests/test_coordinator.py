@@ -223,3 +223,105 @@ async def test_failed_panel_fetch_keeps_previous_details():
 
     assert api.get_solar_panel.await_count == 2
     assert data.panel_details == {"AAAAAAAAAAAA": {"rssiWifi": -60.0}}
+
+
+class FakeDayEnergyApi:
+    """Serves energyAmountsAndCostsForDay per requested day, or a 500."""
+
+    def __init__(self, days: dict[str, dict]) -> None:
+        self.days = days
+        self.requested: list[str] = []
+
+    def __call__(self, day: str, zone: str) -> dict:
+        self.requested.append(day)
+        if day not in self.days:
+            raise SunologyStreamApiError("500")
+        return self.days[day]
+
+
+async def update_at(coordinator, now: datetime):
+    with patch.object(dt_util, "now", return_value=now):
+        return await coordinator._async_update_data()
+
+
+@pytest.mark.asyncio
+async def test_yesterday_last_hour_is_counted_after_midnight():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    day_26, day_27 = "2026-09-25T22:00:00.000Z", "2026-09-26T22:00:00.000Z"
+    fake = FakeDayEnergyApi({day_26: {"hours": "00-22"}})
+    api = make_erl_api()
+    api.get_energy_amounts_and_costs_for_day.side_effect = fake
+    coordinator = make_coordinator(api)
+
+    data = await update_at(coordinator, datetime(2026, 9, 26, 23, 50, tzinfo=paris))
+    assert data.day_energy == {"hours": "00-22"}
+    assert data.day_energy_start == datetime(2026, 9, 26, tzinfo=paris)
+
+    # After midnight, today has no completed hour yet (500): yesterday is
+    # fetched again, now including its 23:00-24:00 hour.
+    fake.days[day_26] = {"hours": "00-23"}
+    data = await update_at(coordinator, datetime(2026, 9, 27, 0, 0, 30, tzinfo=paris))
+    assert fake.requested[-2:] == [day_27, day_26]
+    assert data.day_energy == {"hours": "00-23"}
+    assert data.day_energy_start == datetime(2026, 9, 26, tzinfo=paris)
+
+    # Once today's first hour is complete, switch to today.
+    fake.days[day_27] = {"hours": "00"}
+    data = await update_at(coordinator, datetime(2026, 9, 27, 1, 6, tzinfo=paris))
+    assert fake.requested[-1] == day_27
+    assert data.day_energy == {"hours": "00"}
+    assert data.day_energy_start == datetime(2026, 9, 27, tzinfo=paris)
+
+
+@pytest.mark.asyncio
+async def test_transient_error_keeps_today_without_falling_back():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    day_27 = "2026-09-26T22:00:00.000Z"
+    fake = FakeDayEnergyApi({day_27: {"hours": "00-11"}})
+    api = make_erl_api()
+    api.get_energy_amounts_and_costs_for_day.side_effect = fake
+    coordinator = make_coordinator(api)
+
+    await update_at(coordinator, datetime(2026, 9, 27, 12, tzinfo=paris))
+    del fake.days[day_27]
+    data = await update_at(coordinator, datetime(2026, 9, 27, 12, 6, tzinfo=paris))
+
+    assert fake.requested == [day_27, day_27]  # yesterday never requested
+    assert data.day_energy == {"hours": "00-11"}
+    assert data.day_energy_start == datetime(2026, 9, 27, tzinfo=paris)
+
+
+@pytest.mark.asyncio
+async def test_failed_yesterday_fallback_keeps_yesterday_but_not_older():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    day_26 = "2026-09-25T22:00:00.000Z"
+    fake = FakeDayEnergyApi({day_26: {"hours": "00-22"}})
+    api = make_erl_api()
+    api.get_energy_amounts_and_costs_for_day.side_effect = fake
+    coordinator = make_coordinator(api)
+
+    await update_at(coordinator, datetime(2026, 9, 26, 23, 50, tzinfo=paris))
+    fake.days.clear()
+
+    # Just after midnight: yesterday's partial data is still the best we have.
+    data = await update_at(coordinator, datetime(2026, 9, 27, 0, 1, tzinfo=paris))
+    assert data.day_energy == {"hours": "00-22"}
+    assert data.day_energy_start == datetime(2026, 9, 26, tzinfo=paris)
+
+    # A day later, it would be two days old: dropped.
+    data = await update_at(coordinator, datetime(2026, 9, 28, 0, 1, tzinfo=paris))
+    assert data.day_energy is None
+    assert data.day_energy_start is None
+
+
+@pytest.mark.asyncio
+async def test_yesterday_fallback_across_dst_change():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    fake = FakeDayEnergyApi({})
+    api = make_erl_api()
+    api.get_energy_amounts_and_costs_for_day.side_effect = fake
+
+    # 2026-10-25 is the switch back to CET: the 24th started at 22:00 UTC.
+    await update_at(make_coordinator(api), datetime(2026, 10, 26, 0, 1, tzinfo=paris))
+
+    assert fake.requested == ["2026-10-25T23:00:00.000Z", "2026-10-24T22:00:00.000Z"]

@@ -6,7 +6,7 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût, diagnostics par panneau : WiFi, firmware, dernière synchro, seuil et mode de la batterie), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
 
-Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée : ils ont jusqu'à une heure de retard et restent « inconnus » entre minuit et la fin de la première heure. Les capteurs de coût sont en `state_class: total` avec un `last_reset` à minuit, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
+Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée, donc avec jusqu'à une heure de retard. Entre minuit et la fin de la première heure, ils affichent encore le total complet de la veille, tranche 23h-minuit comprise, puis repartent de zéro : aucune heure n'est perdue. Les capteurs de coût sont en `state_class: total` avec un `last_reset` sur le jour affiché, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
 
 ## Contexte
 
@@ -35,7 +35,7 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/erl`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
 - `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations horaires du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
-- `GET /api/client/energyAmountsAndCostsForDay?zone=&day=` — `day` = minuit local en ISO UTC (`2026-09-25T22:00:00.000Z`). Par heure terminée (clé = heure UTC) : `consumptionInKWh`/`consumptionInEuros`, `productionInKWh`, `energySoldInKWh`, `dischargeInKWh`, et `priceCentsPerKWh` (tarif HC/HP du contrat, au prorata pour les heures à cheval sur un changement de tarif). Renvoie une 500 tant qu'aucune heure du jour n'est terminée (juste après minuit).
+- `GET /api/client/energyAmountsAndCostsForDay?zone=&day=` — `day` = minuit local en ISO UTC (`2026-09-25T22:00:00.000Z`). Par heure terminée (clé = heure UTC) : `consumptionInKWh`/`consumptionInEuros`, `productionInKWh`, `energySoldInKWh`, `dischargeInKWh`, et `priceCentsPerKWh` (tarif HC/HP du contrat, au prorata pour les heures à cheval sur un changement de tarif). Renvoie une 500 tant qu'aucune heure du jour n'est terminée (juste après minuit), puis les 24 heures du jour, à 0 pour celles qui ne sont pas terminées.
 - `GET /api/client/clientSignedContract` — contrat d'électricité (offre, option, puissance, `off_peak_hours` : plages d'heures creuses).
 - `GET /api/client/electricityCosts?zone=` — cumuls achetés/produits/économisés en kWh et en euros.
 - `POST /api/overview`
