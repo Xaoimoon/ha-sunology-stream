@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -14,6 +15,7 @@ from custom_components.sunology_stream.api import (
 )
 from custom_components.sunology_stream.coordinator import (
     SunologyStreamDataUpdateCoordinator,
+    zone_param,
 )
 
 
@@ -88,3 +90,10 @@ async def test_connection_error_becomes_update_failed():
     coordinator = make_coordinator(api)
     with pytest.raises(UpdateFailed):
         await coordinator._async_update_data()
+
+
+def test_zone_param_is_offset_in_hours():
+    assert zone_param(datetime(2026, 9, 26, 12, tzinfo=timezone(timedelta(hours=2)))) == "2"
+    assert zone_param(datetime(2026, 1, 26, 12, tzinfo=timezone(timedelta(hours=1)))) == "1"
+    assert zone_param(datetime(2026, 1, 26, 12, tzinfo=timezone.utc)) == "0"
+    assert zone_param(datetime(2026, 1, 26, 12, tzinfo=timezone(timedelta(hours=5, minutes=30)))) == "5.5"

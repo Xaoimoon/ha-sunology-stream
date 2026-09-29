@@ -19,10 +19,10 @@ DEVICES_STATIONS_AND_STORAGES_ENDPOINT = "/devices/stations-and-storages"
 DEVICES_ACCESSORIES_ENDPOINT = "/devices/accessories"
 HISTORY_ENDPOINT = "/history"
 
-# The "zone" query param is a Java ZoneOffset, and only the compact form
-# (no colon, e.g. "+0200") is accepted — "+02:00" is rejected. Also accepts
-# plain integers (interpreted as something other than hours, confirmed by
-# testing — steer clear of those and always use the strftime("%z") form.
+# The "zone" query param is the UTC offset in hours, as the app sends it
+# (-(new Date().getTimezoneOffset()) / 60, e.g. "2" in CEST). "+0200" is also
+# accepted but silently misinterpreted: history comes back spanning several
+# days and consumption shifted by ~30h (confirmed against Enedis data).
 HISTORY_DAILY_SCALE = "DAILY"
 
 # NOTE: /users/authenticated does not exist (confirmed 404 against the real
