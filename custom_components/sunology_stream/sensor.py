@@ -16,6 +16,7 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     CURRENCY_EURO,
     PERCENTAGE,
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
@@ -34,6 +35,9 @@ class SunologyStreamSensorDescription(SensorEntityDescription):
     """Describes a Sunology Stream sensor entity."""
 
     value_fn: Callable[[SunologyStreamData], Any]
+    # For state_class TOTAL sensors that restart from 0 at local midnight:
+    # exposes last_reset so long-term statistics handle the daily reset.
+    resets_daily: bool = False
 
 
 SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
@@ -177,13 +181,28 @@ def _day_consumption_split(data: SunologyStreamData, off_peak: bool) -> float | 
     return round(total, 3)
 
 
-def _day_consumption_cost(data: SunologyStreamData) -> float | None:
+def _day_consumption_cost(
+    data: SunologyStreamData, off_peak: bool | None = None
+) -> float | None:
+    """Today's grid consumption cost (EUR), as priced by the API.
+
+    With `off_peak` set, only the off-peak (True) or peak (False) share. The
+    two hours straddling a tariff change are split by duration, which is off
+    by less than a cent a day compared to pricing each part separately.
+    """
     if data.day_energy is None:
         return None
-    return round(
-        sum(values.get("consumptionInEuros") or 0 for _, values in _day_energy_hours(data)),
-        2,
-    )
+    ranges = _off_peak_ranges(data.contract)
+    if off_peak is not None and not ranges:
+        return None
+    total = 0.0
+    for hour_start, values in _day_energy_hours(data):
+        cost = values.get("consumptionInEuros") or 0
+        if off_peak is not None:
+            fraction = _off_peak_fraction(hour_start, ranges)
+            cost *= fraction if off_peak else 1 - fraction
+        total += cost
+    return round(total, 2)
 
 
 # Built on /client/energyAmountsAndCostsForDay, which only lists completed
@@ -205,6 +224,26 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         value_fn=lambda data: _day_consumption_split(data, off_peak=False),
     ),
+    # Meant as the "entity tracking the total costs" of the matching grid
+    # consumption source in the Energy dashboard.
+    SunologyStreamSensorDescription(
+        key="daily_off_peak_consumption_cost",
+        translation_key="daily_off_peak_consumption_cost",
+        device_class=SensorDeviceClass.MONETARY,
+        native_unit_of_measurement=CURRENCY_EURO,
+        state_class=SensorStateClass.TOTAL,
+        resets_daily=True,
+        value_fn=lambda data: _day_consumption_cost(data, off_peak=True),
+    ),
+    SunologyStreamSensorDescription(
+        key="daily_peak_consumption_cost",
+        translation_key="daily_peak_consumption_cost",
+        device_class=SensorDeviceClass.MONETARY,
+        native_unit_of_measurement=CURRENCY_EURO,
+        state_class=SensorStateClass.TOTAL,
+        resets_daily=True,
+        value_fn=lambda data: _day_consumption_cost(data, off_peak=False),
+    ),
 )
 
 DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
@@ -212,7 +251,59 @@ DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
     translation_key="daily_consumption_cost",
     device_class=SensorDeviceClass.MONETARY,
     native_unit_of_measurement=CURRENCY_EURO,
+    state_class=SensorStateClass.TOTAL,
+    resets_daily=True,
     value_fn=_day_consumption_cost,
+)
+
+
+@dataclass(frozen=True, kw_only=True)
+class SunologyStreamPanelDetailDescription(SensorEntityDescription):
+    """Describes a per-panel sensor built on /solar-panels/{id}."""
+
+    name_suffix: str
+    value_fn: Callable[[dict[str, Any]], Any]
+    # Only created for panels with an integrated battery (overview "has_b").
+    requires_battery: bool = False
+
+
+def _parse_timestamp(raw: Any) -> datetime | None:
+    return dt_util.parse_datetime(raw) if raw else None
+
+
+PANEL_DETAIL_DESCRIPTIONS: tuple[SunologyStreamPanelDetailDescription, ...] = (
+    SunologyStreamPanelDetailDescription(
+        key="wifi_signal",
+        name_suffix="WiFi signal",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda details: details.get("rssiWifi"),
+    ),
+    SunologyStreamPanelDetailDescription(
+        key="firmware_version",
+        name_suffix="firmware",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda details: details.get("firmwareVersion"),
+    ),
+    SunologyStreamPanelDetailDescription(
+        key="last_synchronization",
+        name_suffix="last synchronization",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda details: _parse_timestamp(details.get("lastSynchronizationDate")),
+    ),
+    # Grid power above which the battery starts charging (app: 210-450 W).
+    SunologyStreamPanelDetailDescription(
+        key="battery_charge_threshold",
+        name_suffix="battery charge threshold",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda details: details.get("batteryThreshold"),
+        requires_battery=True,
+    ),
 )
 
 
@@ -229,6 +320,7 @@ async def async_setup_entry(
         | SunologyStreamPanelProductionSensor
         | SunologyStreamPanelBatteryLevelSensor
         | SunologyStreamPanelBatteryStateSensor
+        | SunologyStreamPanelDetailSensor
     ] = [
         SunologyStreamSensor(coordinator, entry.entry_id, description)
         for description in SENSOR_DESCRIPTIONS
@@ -271,6 +363,14 @@ async def async_setup_entry(
                 coordinator, entry.entry_id, serial_number, surname
             )
         )
+        if serial_number in coordinator.data.panel_details:
+            entities.extend(
+                SunologyStreamPanelDetailSensor(
+                    coordinator, entry.entry_id, serial_number, surname, description
+                )
+                for description in PANEL_DETAIL_DESCRIPTIONS
+                if panel_data.get("has_b") or not description.requires_battery
+            )
 
     async_add_entities(entities)
 
@@ -296,6 +396,12 @@ class SunologyStreamSensor(
     @property
     def native_value(self) -> Any:
         return self.entity_description.value_fn(self.coordinator.data)
+
+    @property
+    def last_reset(self) -> datetime | None:
+        if self.entity_description.resets_daily:
+            return dt_util.start_of_local_day()
+        return None
 
 
 class SunologyStreamPanelProductionSensor(
@@ -385,3 +491,33 @@ class SunologyStreamPanelBatteryStateSensor(
         panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
         panel = panels.get(self._serial_number, {})
         return panel.get("batteryState")
+
+
+class SunologyStreamPanelDetailSensor(
+    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
+):
+    """A per-panel diagnostic sensor built on /solar-panels/{id}."""
+
+    entity_description: SunologyStreamPanelDetailDescription
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: SunologyStreamDataUpdateCoordinator,
+        entry_id: str,
+        serial_number: str,
+        surname: str | None,
+        description: SunologyStreamPanelDetailDescription,
+    ) -> None:
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._serial_number = serial_number
+        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_{description.key}"
+        self._attr_name = f"{surname or serial_number} {description.name_suffix}"
+
+    @property
+    def native_value(self) -> Any:
+        details = self.coordinator.data.panel_details.get(self._serial_number)
+        if details is None:
+            return None
+        return self.entity_description.value_fn(details)

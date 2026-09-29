@@ -18,6 +18,7 @@ from custom_components.sunology_stream.sensor import (
     DAILY_CONSUMPTION_COST_DESCRIPTION,
     ERL_LAST_SYNC_DESCRIPTION,
     OFF_PEAK_DESCRIPTIONS,
+    PANEL_DETAIL_DESCRIPTIONS,
     SENSOR_DESCRIPTIONS,
     _off_peak_ranges,
 )
@@ -41,6 +42,7 @@ def sample_data() -> SunologyStreamData:
         storage_batteries=[],
         contract=load_fixture("client-signed-contract"),
         day_energy=load_fixture("energy-amounts-and-costs-for-day"),
+        panel_details={"AAAAAAAAAAAA": load_fixture("solar-panel")},
     )
 
 
@@ -156,3 +158,61 @@ def test_daily_consumption_cost(sample_data: SunologyStreamData):
 def test_daily_consumption_cost_without_day_energy(sample_data: SunologyStreamData):
     sample_data.day_energy = None
     assert DAILY_CONSUMPTION_COST_DESCRIPTION.value_fn(sample_data) is None
+
+
+def get_panel_detail_description(key: str):
+    return next(d for d in PANEL_DETAIL_DESCRIPTIONS if d.key == key)
+
+
+def test_panel_details_values(sample_data: SunologyStreamData):
+    details = sample_data.panel_details["AAAAAAAAAAAA"]
+    assert get_panel_detail_description("wifi_signal").value_fn(details) == -75.0
+    assert get_panel_detail_description("firmware_version").value_fn(details) == "202624.2"
+    assert get_panel_detail_description("battery_charge_threshold").value_fn(details) == 210
+    synced = get_panel_detail_description("last_synchronization").value_fn(details)
+    assert synced == datetime(2026, 9, 29, 22, 54, 33, tzinfo=dt_util.UTC)
+
+
+def test_panel_details_missing_values():
+    assert get_panel_detail_description("wifi_signal").value_fn({}) is None
+    assert get_panel_detail_description("last_synchronization").value_fn({}) is None
+
+
+def test_only_battery_threshold_requires_a_battery():
+    assert [d.key for d in PANEL_DETAIL_DESCRIPTIONS if d.requires_battery] == [
+        "battery_charge_threshold"
+    ]
+
+
+@pytest.mark.usefixtures("paris_time_zone")
+def test_daily_off_peak_and_peak_consumption_cost(sample_data: SunologyStreamData):
+    off_peak = get_off_peak_description("daily_off_peak_consumption_cost")
+    peak = get_off_peak_description("daily_peak_consumption_cost")
+    off_peak_cost = off_peak.value_fn(sample_data)
+    peak_cost = peak.value_fn(sample_data)
+    # ~14.219 kWh x 0.16 and ~31.781 kWh x 0.21 (API prices on that day).
+    assert off_peak_cost == pytest.approx(2.27, abs=0.01)
+    assert peak_cost == pytest.approx(6.68, abs=0.01)
+    # The split adds up to the day's total.
+    assert off_peak_cost + peak_cost == pytest.approx(
+        DAILY_CONSUMPTION_COST_DESCRIPTION.value_fn(sample_data), abs=0.01
+    )
+
+
+def test_daily_off_peak_consumption_cost_without_contract(sample_data: SunologyStreamData):
+    sample_data.contract = None
+    off_peak = get_off_peak_description("daily_off_peak_consumption_cost")
+    assert off_peak.value_fn(sample_data) is None
+    # The total cost doesn't need the contract.
+    assert DAILY_CONSUMPTION_COST_DESCRIPTION.value_fn(sample_data) == pytest.approx(8.95)
+
+
+def test_cost_sensors_are_daily_totals():
+    costs = [
+        DAILY_CONSUMPTION_COST_DESCRIPTION,
+        get_off_peak_description("daily_off_peak_consumption_cost"),
+        get_off_peak_description("daily_peak_consumption_cost"),
+    ]
+    for description in costs:
+        assert description.state_class == "total"
+        assert description.resets_daily

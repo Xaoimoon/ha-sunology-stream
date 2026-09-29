@@ -18,6 +18,7 @@ from .const import (
     BASE_URL,
     CLIENT_ENDPOINT,
     CLIENT_SIGNED_CONTRACT_ENDPOINT,
+    DEVICES_STATIONS_AND_STORAGES_ENDPOINT,
     ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT,
     ERL_ENDPOINT,
     HISTORY_DAILY_SCALE,
@@ -26,6 +27,7 @@ from .const import (
     LOGOUT_ENDPOINT,
     ME_ENDPOINT,
     OVERVIEW_ENDPOINT,
+    SOLAR_PANELS_ENDPOINT,
     STORAGE_BATTERY_ALL_PAIRED_ENDPOINT,
     STREAM_METER_ENDPOINT,
 )
@@ -165,3 +167,13 @@ class SunologyStreamApiClient:
             ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT,
             params={"zone": zone, "day": day},
         )
+
+    async def get_stations_and_storages(self) -> list[Any]:
+        """Return the account's panels and batteries, with their device ids."""
+        return await self._request("GET", DEVICES_STATIONS_AND_STORAGES_ENDPOINT)  # type: ignore[return-value]
+
+    async def get_solar_panel(self, panel_id: str) -> dict[str, Any]:
+        """Return one panel's details (firmware, WiFi RSSI, last sync, battery
+        settings). `panel_id` is the device id, not the serial number.
+        """
+        return await self._request("GET", f"{SOLAR_PANELS_ENDPOINT}/{panel_id}")  # type: ignore[return-value]

@@ -54,6 +54,12 @@
       "daily_consumption_cost": {
         "name": "Coût de la consommation du jour"
       },
+      "daily_off_peak_consumption_cost": {
+        "name": "Coût de la consommation en heures creuses du jour"
+      },
+      "daily_peak_consumption_cost": {
+        "name": "Coût de la consommation en heures pleines du jour"
+      },
       "self_reliance": {
         "name": "Taux d'autonomie"
       },

@@ -175,3 +175,51 @@ async def test_slow_data_skips_day_energy_without_erl():
 
     api.get_energy_amounts_and_costs_for_day.assert_not_called()
     assert data.day_energy is None
+
+
+@pytest.mark.asyncio
+async def test_panel_details_are_keyed_by_serial_number():
+    api = make_erl_api()
+    api.get_overview.return_value = {
+        "production": {"panels": {"AAAAAAAAAAAA": {}, "BBBBBBBBBBBB": {}}},
+        "consumptionData": {},
+    }
+    api.get_stations_and_storages.return_value = [
+        {"id": "id-a", "serialNumber": "AAAAAAAAAAAA", "type": "PLAY_MAX"},
+        {"id": "id-b", "serialNumber": "BBBBBBBBBBBB", "type": "PLAY_MAX"},
+        # Not in the overview's panels (e.g. a storage battery): skipped.
+        {"id": "id-s", "serialNumber": "SSSSSSSSSSSS", "type": "STOREY"},
+    ]
+    api.get_solar_panel.side_effect = lambda panel_id: {"id": panel_id}
+
+    data = await make_coordinator(api)._async_update_data()
+
+    assert data.panel_details == {
+        "AAAAAAAAAAAA": {"id": "id-a"},
+        "BBBBBBBBBBBB": {"id": "id-b"},
+    }
+    assert api.get_solar_panel.await_count == 2
+
+
+@pytest.mark.asyncio
+async def test_failed_panel_fetch_keeps_previous_details():
+    api = make_erl_api()
+    api.get_overview.return_value = {
+        "production": {"panels": {"AAAAAAAAAAAA": {}}},
+        "consumptionData": {},
+    }
+    api.get_stations_and_storages.return_value = [
+        {"id": "id-a", "serialNumber": "AAAAAAAAAAAA"}
+    ]
+    api.get_solar_panel.return_value = {"rssiWifi": -60.0}
+    coordinator = make_coordinator(api)
+    paris = dt_util.get_time_zone("Europe/Paris")
+
+    with patch.object(dt_util, "now", return_value=datetime(2026, 9, 26, 12, tzinfo=paris)):
+        await coordinator._async_update_data()
+    api.get_solar_panel.side_effect = SunologyStreamApiError("500")
+    with patch.object(dt_util, "now", return_value=datetime(2026, 9, 26, 12, 6, tzinfo=paris)):
+        data = await coordinator._async_update_data()
+
+    assert api.get_solar_panel.await_count == 2
+    assert data.panel_details == {"AAAAAAAAAAAA": {"rssiWifi": -60.0}}

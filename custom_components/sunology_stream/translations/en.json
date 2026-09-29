@@ -54,6 +54,12 @@
       "daily_consumption_cost": {
         "name": "Consumption cost today"
       },
+      "daily_off_peak_consumption_cost": {
+        "name": "Off-peak consumption cost today"
+      },
+      "daily_peak_consumption_cost": {
+        "name": "Peak consumption cost today"
+      },
       "self_reliance": {
         "name": "Self-reliance"
       },

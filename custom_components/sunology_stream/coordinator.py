@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -41,6 +41,8 @@ class SunologyStreamData:
     # successfully (or, for day_energy, if the account has no ERL).
     contract: dict[str, Any] | None = None
     day_energy: dict[str, Any] | None = None
+    # Per-panel details from /solar-panels/{id}, keyed by serial number.
+    panel_details: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 def zone_param(now: datetime) -> str:
@@ -74,6 +76,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self.api = api
         self._contract: dict[str, Any] | None = None
         self._day_energy: dict[str, Any] | None = None
+        self._panel_details: dict[str, dict[str, Any]] = {}
         self._slow_refreshed_at: datetime | None = None
         self._slow_refreshed_day: str | None = None
 
@@ -100,7 +103,12 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             if client.get("hasStorageBattery"):
                 storage_batteries = await self.api.get_storage_battery_all_paired()
 
-            await self._async_refresh_slow_data(now, zone, bool(client.get("hasErl")))
+            await self._async_refresh_slow_data(
+                now,
+                zone,
+                bool(client.get("hasErl")),
+                set(overview.get("production", {}).get("panels", {})),
+            )
         except SunologyStreamAuthError as err:
             raise ConfigEntryAuthFailed("Session expired and re-login failed") from err
         except SunologyStreamConnectionError as err:
@@ -115,12 +123,13 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             storage_batteries=storage_batteries,
             contract=self._contract,
             day_energy=self._day_energy,
+            panel_details=dict(self._panel_details),
         )
 
     async def _async_refresh_slow_data(
-        self, now: datetime, zone: str, has_erl: bool
+        self, now: datetime, zone: str, has_erl: bool, panel_serials: set[str]
     ) -> None:
-        """Refresh the contract and today's hourly energy, at most every
+        """Refresh the contract, today's hourly energy and the panel details, at most every
         SLOW_SCAN_INTERVAL (and right away when the local day changes).
 
         These endpoints are best-effort: a failure keeps the previous values
@@ -154,5 +163,37 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
                     # Never report yesterday's totals as today's.
                     self._day_energy = None
 
+        await self._async_refresh_panel_details(panel_serials)
+
         self._slow_refreshed_at = now
         self._slow_refreshed_day = day
+
+    async def _async_refresh_panel_details(self, panel_serials: set[str]) -> None:
+        """Fetch /solar-panels/{id} for each panel listed in the overview.
+
+        The overview keys panels by serial number, but /solar-panels wants
+        the device id, so the mapping comes from /devices/stations-and-storages.
+        A panel whose fetch fails keeps its previous details.
+        """
+        if not panel_serials:
+            return
+        try:
+            devices = await self.api.get_stations_and_storages()
+        except SunologyStreamAuthError:
+            raise
+        except SunologyStreamApiError as err:
+            _LOGGER.debug("Cannot list the account's devices: %s", err)
+            return
+
+        for device in devices or []:
+            serial_number = device.get("serialNumber")
+            if serial_number not in panel_serials or not device.get("id"):
+                continue
+            try:
+                self._panel_details[serial_number] = await self.api.get_solar_panel(
+                    device["id"]
+                )
+            except SunologyStreamAuthError:
+                raise
+            except SunologyStreamApiError as err:
+                _LOGGER.debug("Cannot fetch details of panel %s: %s", serial_number, err)

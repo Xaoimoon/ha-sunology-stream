@@ -4,9 +4,9 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 ## Statut
 
-🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
+🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût, diagnostics par panneau : WiFi, firmware, dernière synchro, seuil et mode de la batterie), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
 
-Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée : ils ont jusqu'à une heure de retard et restent « inconnus » entre minuit et la fin de la première heure.
+Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée : ils ont jusqu'à une heure de retard et restent « inconnus » entre minuit et la fin de la première heure. Les capteurs de coût sont en `state_class: total` avec un `last_reset` à minuit, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
 
 ## Contexte
 
@@ -31,7 +31,7 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/devices/accessories`
 - `GET /api/stream-meter`
 - `GET /api/storage-battery/all-paired`, `GET /api/storage-battery/{id}`
-- `GET /api/solar-panels/{id}`
+- `GET /api/solar-panels/{id}` — `id` = identifiant d'appareil (pas le numéro de série), obtenu via `/devices/stations-and-storages`. Renvoie `firmwareVersion`, `rssiWifi` (dBm), `lastSynchronizationDate`, `state`, `batteryThreshold` (seuil de déclenchement de la charge, 210-450 W) et `batteryPreserveEnergy` (option « nomade » : pas de décharge pendant 18 h).
 - `GET /api/erl`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
 - `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations horaires du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).

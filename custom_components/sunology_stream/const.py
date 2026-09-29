@@ -17,6 +17,7 @@ STORAGE_BATTERY_ALL_PAIRED_ENDPOINT = "/storage-battery/all-paired"
 ERL_ENDPOINT = "/erl"
 DEVICES_STATIONS_AND_STORAGES_ENDPOINT = "/devices/stations-and-storages"
 DEVICES_ACCESSORIES_ENDPOINT = "/devices/accessories"
+SOLAR_PANELS_ENDPOINT = "/solar-panels"
 HISTORY_ENDPOINT = "/history"
 CLIENT_SIGNED_CONTRACT_ENDPOINT = "/client/clientSignedContract"
 ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT = "/client/energyAmountsAndCostsForDay"
@@ -32,6 +33,6 @@ HISTORY_DAILY_SCALE = "DAILY"
 # session validity instead.
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
-# Hourly per-tariff energy and the contract only change once an hour at
-# best, so they are refreshed less often than the live power data.
+# Hourly per-tariff energy, the contract and per-panel diagnostics change
+# rarely, so they are refreshed less often than the live power data.
 SLOW_SCAN_INTERVAL = timedelta(minutes=5)
