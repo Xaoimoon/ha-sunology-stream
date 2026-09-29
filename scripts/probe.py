@@ -104,14 +104,16 @@ def main() -> int:
     show("irradiance", session.get(f"{BASE_URL}/irradiance", timeout=15))
     show("irradiance-forecast", session.get(f"{BASE_URL}/irradiance-forecast", timeout=15))
 
-    # zone must be a compact ZoneOffset string ("+0200"), not "+02:00" or an
-    # IANA name — both are rejected. Discovered by trial and error.
+    # zone is the UTC offset in hours ("2"), as the app sends it. "+0200" is
+    # accepted but misinterpreted (multi-day, shifted data).
     now = datetime.now().astimezone()
+    offset_hours = now.utcoffset().total_seconds() / 3600
+    zone = str(int(offset_hours)) if offset_hours.is_integer() else str(offset_hours)
     show(
         "history-daily",
         session.get(
             f"{BASE_URL}/history/DAILY/{now.strftime('%Y-%m-%d')}",
-            params={"zone": now.strftime("%z")},
+            params={"zone": zone},
             timeout=15,
         ),
     )

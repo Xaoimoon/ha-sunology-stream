@@ -136,8 +136,8 @@ class SunologyStreamApiClient:
     async def get_history_daily(self, date: str, zone: str) -> dict[str, Any]:
         """Return the daily production/consumption history for a given date.
 
-        `date` must be "YYYY-MM-DD". `zone` must be a compact ZoneOffset
-        string like "+0200" (no colon — the API rejects "+02:00").
+        `date` must be "YYYY-MM-DD". `zone` is the UTC offset in hours, e.g.
+        "2" (see HISTORY_DAILY_SCALE in const.py).
         """
         return await self._request(  # type: ignore[return-value]
             "GET",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -37,6 +38,13 @@ class SunologyStreamData:
     storage_batteries: list[Any]
 
 
+def zone_param(now: datetime) -> str:
+    """Format the API "zone" param: the UTC offset in hours, e.g. "2"."""
+    offset = now.utcoffset()
+    hours = offset.total_seconds() / 3600 if offset else 0.0
+    return str(int(hours)) if hours.is_integer() else str(hours)
+
+
 class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamData]):
     """Coordinates polling of the Sunology Stream cloud API."""
 
@@ -59,7 +67,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
 
             now = dt_util.now()
             history_daily = await self.api.get_history_daily(
-                now.strftime("%Y-%m-%d"), now.strftime("%z")
+                now.strftime("%Y-%m-%d"), zone_param(now)
             )
 
             erl: dict[str, Any] | None = None

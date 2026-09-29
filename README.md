@@ -32,8 +32,12 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/solar-panels/{id}`
 - `GET /api/erl`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
-- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` confirmé : `DAILY`. `zone` doit être un `ZoneOffset` Java au format compact **sans deux-points** (`+0200`, pas `+02:00`, pas de nom IANA type `Europe/Paris` — tout ça est rejeté avec 400). Renvoie productions/consommations du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
+- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
 - `POST /api/overview`
+
+**Paramètre `zone`** : décalage UTC **en heures**, comme l'envoie l'appli (`-(new Date().getTimezoneOffset()) / 60`, soit `2` en heure d'été et `1` en hiver). `+02:00` est rejeté (400). `+0200` est accepté mais mal interprété : l'historique couvre alors plusieurs jours et la consommation est décalée d'environ 30 h.
+
+Avec le bon `zone`, la consommation horaire issue de la TIC correspond à la courbe de charge Enedis à ~0,1 % près par jour (vérifié sur 7 jours via MyElectricalData).
 
 Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un vrai compte (voir section Développement) — les réponses ne sont pas commitées (données personnelles) mais servent à valider le parsing des entités.
 
