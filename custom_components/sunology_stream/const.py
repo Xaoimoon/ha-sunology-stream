@@ -18,6 +18,8 @@ ERL_ENDPOINT = "/erl"
 DEVICES_STATIONS_AND_STORAGES_ENDPOINT = "/devices/stations-and-storages"
 DEVICES_ACCESSORIES_ENDPOINT = "/devices/accessories"
 HISTORY_ENDPOINT = "/history"
+CLIENT_SIGNED_CONTRACT_ENDPOINT = "/client/clientSignedContract"
+ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT = "/client/energyAmountsAndCostsForDay"
 
 # The "zone" query param is the UTC offset in hours, as the app sends it
 # (-(new Date().getTimezoneOffset()) / 60, e.g. "2" in CEST). "+0200" is also
@@ -30,3 +32,6 @@ HISTORY_DAILY_SCALE = "DAILY"
 # session validity instead.
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
+# Hourly per-tariff energy and the contract only change once an hour at
+# best, so they are refreshed less often than the live power data.
+SLOW_SCAN_INTERVAL = timedelta(minutes=5)
