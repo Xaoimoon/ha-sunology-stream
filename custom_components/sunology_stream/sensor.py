@@ -206,7 +206,8 @@ def _day_consumption_cost(
 
 
 # Built on /client/energyAmountsAndCostsForDay, which only lists completed
-# hours: these lag real time by up to an hour, and read 0 just after midnight.
+# hours: these lag real time by up to an hour, and until about 01:00 they
+# still show yesterday's full total (including its 23:00-24:00 hour).
 OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_off_peak_consumption_energy",
@@ -399,8 +400,10 @@ class SunologyStreamSensor(
 
     @property
     def last_reset(self) -> datetime | None:
+        # The day the published data covers, not the current day: just after
+        # midnight the value is still yesterday's total (see coordinator).
         if self.entity_description.resets_daily:
-            return dt_util.start_of_local_day()
+            return self.coordinator.data.day_energy_start
         return None
 
 

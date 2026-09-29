@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -41,6 +41,9 @@ class SunologyStreamData:
     # successfully (or, for day_energy, if the account has no ERL).
     contract: dict[str, Any] | None = None
     day_energy: dict[str, Any] | None = None
+    # Local midnight of the day `day_energy` covers. Usually today, but
+    # yesterday between midnight and the end of today's first hour.
+    day_energy_start: datetime | None = None
     # Per-panel details from /solar-panels/{id}, keyed by serial number.
     panel_details: dict[str, dict[str, Any]] = field(default_factory=dict)
 
@@ -52,12 +55,16 @@ def zone_param(now: datetime) -> str:
     return str(int(hours)) if hours.is_integer() else str(hours)
 
 
+def local_midnight(now: datetime) -> datetime:
+    """Midnight of `now`'s day, in `now`'s time zone."""
+    return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
 def day_param(now: datetime) -> str:
     """Local midnight of `now`'s day as a UTC ISO timestamp, like the app's
     `startOfDay(date).toISOString()`, e.g. "2026-09-25T22:00:00.000Z".
     """
-    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    return dt_util.as_utc(midnight).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    return dt_util.as_utc(local_midnight(now)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
 class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamData]):
@@ -76,6 +83,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self.api = api
         self._contract: dict[str, Any] | None = None
         self._day_energy: dict[str, Any] | None = None
+        self._day_energy_start: datetime | None = None
         self._panel_details: dict[str, dict[str, Any]] = {}
         self._slow_refreshed_at: datetime | None = None
         self._slow_refreshed_day: str | None = None
@@ -123,6 +131,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             storage_batteries=storage_batteries,
             contract=self._contract,
             day_energy=self._day_energy,
+            day_energy_start=self._day_energy_start,
             panel_details=dict(self._panel_details),
         )
 
@@ -151,22 +160,52 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             _LOGGER.debug("Cannot fetch the signed contract: %s", err)
 
         if has_erl:
-            try:
-                self._day_energy = await self.api.get_energy_amounts_and_costs_for_day(
-                    day, zone
-                )
-            except SunologyStreamAuthError:
-                raise
-            except SunologyStreamApiError as err:
-                _LOGGER.debug("Cannot fetch today's energy amounts: %s", err)
-                if day != self._slow_refreshed_day:
-                    # Never report yesterday's totals as today's.
-                    self._day_energy = None
+            await self._async_refresh_day_energy(now, zone)
 
         await self._async_refresh_panel_details(panel_serials)
 
         self._slow_refreshed_at = now
         self._slow_refreshed_day = day
+
+    async def _async_refresh_day_energy(self, now: datetime, zone: str) -> None:
+        """Refresh the hourly energy/costs of today, or finish yesterday's.
+
+        The API only lists completed hours and answers 500 for a day that has
+        none yet, i.e. from midnight until about 01:00. Until today's data
+        exists, yesterday is fetched instead, so its 23:00-24:00 hour (only
+        complete after midnight) still gets counted before the daily reset.
+        """
+        today = local_midnight(now)
+        try:
+            self._day_energy = await self.api.get_energy_amounts_and_costs_for_day(
+                day_param(today), zone
+            )
+            self._day_energy_start = today
+            return
+        except SunologyStreamAuthError:
+            raise
+        except SunologyStreamApiError as err:
+            if self._day_energy_start == today:
+                # Today's data already exists: a transient error, keep it.
+                _LOGGER.debug("Cannot fetch today's energy amounts: %s", err)
+                return
+            _LOGGER.debug("No energy amounts for today yet (%s), finishing yesterday", err)
+
+        # Wall-clock arithmetic on the local time zone: DST-safe.
+        yesterday = local_midnight(today - timedelta(hours=1))
+        try:
+            self._day_energy = await self.api.get_energy_amounts_and_costs_for_day(
+                day_param(yesterday), zone
+            )
+            self._day_energy_start = yesterday
+        except SunologyStreamAuthError:
+            raise
+        except SunologyStreamApiError as err:
+            _LOGGER.debug("Cannot fetch yesterday's energy amounts: %s", err)
+            if self._day_energy_start != yesterday:
+                # Never keep data older than yesterday.
+                self._day_energy = None
+                self._day_energy_start = None
 
     async def _async_refresh_panel_details(self, panel_serials: set[str]) -> None:
         """Fetch /solar-panels/{id} for each panel listed in the overview.

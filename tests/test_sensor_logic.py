@@ -216,3 +216,20 @@ def test_cost_sensors_are_daily_totals():
     for description in costs:
         assert description.state_class == "total"
         assert description.resets_daily
+
+
+def test_cost_last_reset_follows_the_published_day(sample_data: SunologyStreamData):
+    from unittest.mock import MagicMock
+
+    from custom_components.sunology_stream.sensor import SunologyStreamSensor
+
+    yesterday = datetime(2026, 9, 26, tzinfo=dt_util.get_time_zone("Europe/Paris"))
+    sample_data.day_energy_start = yesterday
+    coordinator = MagicMock()
+    coordinator.data = sample_data
+
+    cost = SunologyStreamSensor(coordinator, "entry", DAILY_CONSUMPTION_COST_DESCRIPTION)
+    power = SunologyStreamSensor(coordinator, "entry", get_description("consumption_power"))
+
+    assert cost.last_reset == yesterday
+    assert power.last_reset is None
