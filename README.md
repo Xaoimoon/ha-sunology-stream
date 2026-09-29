@@ -4,7 +4,9 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 ## Statut
 
-🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
+🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
+
+Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée : ils ont jusqu'à une heure de retard et restent « inconnus » entre minuit et la fin de la première heure.
 
 ## Contexte
 
@@ -32,10 +34,13 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/solar-panels/{id}`
 - `GET /api/erl`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
-- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
+- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations horaires du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
+- `GET /api/client/energyAmountsAndCostsForDay?zone=&day=` — `day` = minuit local en ISO UTC (`2026-09-25T22:00:00.000Z`). Par heure terminée (clé = heure UTC) : `consumptionInKWh`/`consumptionInEuros`, `productionInKWh`, `energySoldInKWh`, `dischargeInKWh`, et `priceCentsPerKWh` (tarif HC/HP du contrat, au prorata pour les heures à cheval sur un changement de tarif). Renvoie une 500 tant qu'aucune heure du jour n'est terminée (juste après minuit).
+- `GET /api/client/clientSignedContract` — contrat d'électricité (offre, option, puissance, `off_peak_hours` : plages d'heures creuses).
+- `GET /api/client/electricityCosts?zone=` — cumuls achetés/produits/économisés en kWh et en euros.
 - `POST /api/overview`
 
-**Paramètre `zone`** : décalage UTC **en heures**, comme l'envoie l'appli (`-(new Date().getTimezoneOffset()) / 60`, soit `2` en heure d'été et `1` en hiver). `+02:00` est rejeté (400). `+0200` est accepté mais mal interprété : l'historique couvre alors plusieurs jours et la consommation est décalée d'environ 30 h.
+**Paramètre `zone`** : décalage UTC **en heures**, comme l'envoie l'appli (`-(new Date().getTimezoneOffset()) / 60`, soit `2` en heure d'été et `1` en hiver). `+02:00` est rejeté (400). `+0200` est accepté mais mal interprété : l'historique couvre alors plusieurs jours et la consommation est décalée d'environ 30 h, et `energyAmountsAndCostsForDay`/`electricityCosts` répondent 500.
 
 Avec le bon `zone`, la consommation horaire issue de la TIC correspond à la courbe de charge Enedis à ~0,1 % près par jour (vérifié sur 7 jours via MyElectricalData).
 

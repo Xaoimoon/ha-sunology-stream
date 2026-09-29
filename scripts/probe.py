@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -114,6 +114,20 @@ def main() -> int:
         session.get(
             f"{BASE_URL}/history/DAILY/{now.strftime('%Y-%m-%d')}",
             params={"zone": zone},
+            timeout=15,
+        ),
+    )
+    show("client-signed-contract", session.get(f"{BASE_URL}/client/clientSignedContract", timeout=15))
+    # Yesterday: today's endpoint returns 500 until an hour of the day has ended.
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
+    show(
+        "energy-amounts-and-costs-for-day",
+        session.get(
+            f"{BASE_URL}/client/energyAmountsAndCostsForDay",
+            params={
+                "zone": zone,
+                "day": midnight.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+            },
             timeout=15,
         ),
     )

@@ -1,0 +1,30 @@
+{
+  "config": {
+    "pdl": "00000000000000",
+    "offer_id": 7,
+    "postcode": "00000",
+    "power_id": 3,
+    "option_id": 2,
+    "offer_name": {
+      "fr": "Tarif bleu résidentiel"
+    },
+    "option_name": "Heures pleines heures creuses",
+    "provider_id": 16,
+    "country_code": "fr",
+    "distributor_id": 887,
+    "off_peak_hours": [
+      {
+        "end": "00:00",
+        "start": "22:56"
+      },
+      {
+        "end": "06:56",
+        "start": "00:00"
+      }
+    ],
+    "distributor_name": "Enedis",
+    "off_peak_hours_id": "distributor_hours:278",
+    "custom_off_peak_hours": "no",
+    "enedis_off_peak_hours": "22H56-6H56"
+  }
+}

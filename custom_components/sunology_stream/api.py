@@ -17,6 +17,8 @@ import aiohttp
 from .const import (
     BASE_URL,
     CLIENT_ENDPOINT,
+    CLIENT_SIGNED_CONTRACT_ENDPOINT,
+    ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT,
     ERL_ENDPOINT,
     HISTORY_DAILY_SCALE,
     HISTORY_ENDPOINT,
@@ -143,4 +145,23 @@ class SunologyStreamApiClient:
             "GET",
             f"{HISTORY_ENDPOINT}/{HISTORY_DAILY_SCALE}/{date}",
             params={"zone": zone},
+        )
+
+    async def get_signed_contract(self) -> dict[str, Any]:
+        """Return the electricity contract (offer, option, off-peak hours)."""
+        return await self._request("GET", CLIENT_SIGNED_CONTRACT_ENDPOINT)  # type: ignore[return-value]
+
+    async def get_energy_amounts_and_costs_for_day(
+        self, day: str, zone: str
+    ) -> dict[str, Any]:
+        """Return hourly consumption/production energy and costs for one day.
+
+        `day` is the local midnight as a UTC ISO timestamp, e.g.
+        "2026-09-25T22:00:00.000Z". `zone` is the UTC offset in hours.
+        Only completed hours are returned.
+        """
+        return await self._request(  # type: ignore[return-value]
+            "GET",
+            ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT,
+            params={"zone": zone, "day": day},
         )

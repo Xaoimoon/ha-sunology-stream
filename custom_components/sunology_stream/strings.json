@@ -45,6 +45,15 @@
       "daily_consumption_energy": {
         "name": "Daily consumption energy"
       },
+      "daily_off_peak_consumption_energy": {
+        "name": "Off-peak energy consumed today"
+      },
+      "daily_peak_consumption_energy": {
+        "name": "Peak energy consumed today"
+      },
+      "daily_consumption_cost": {
+        "name": "Consumption cost today"
+      },
       "self_reliance": {
         "name": "Self-reliance"
       },

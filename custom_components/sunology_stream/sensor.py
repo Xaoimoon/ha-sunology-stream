@@ -13,7 +13,13 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfEnergy, UnitOfPower
+from homeassistant.const import (
+    CURRENCY_EURO,
+    PERCENTAGE,
+    EntityCategory,
+    UnitOfEnergy,
+    UnitOfPower,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -110,6 +116,106 @@ def _parse_erl_timestamp(data: SunologyStreamData) -> datetime | None:
     return dt_util.parse_datetime(raw)
 
 
+def _off_peak_ranges(contract: dict[str, Any] | None) -> list[tuple[int, int]]:
+    """Off-peak ranges from the signed contract, in minutes since midnight.
+
+    The contract splits ranges at midnight ({"start": "22:56", "end": "00:00"}
+    and {"start": "00:00", "end": "06:56"}); an "end" of "00:00" means 24:00.
+    """
+    if not contract:
+        return []
+    ranges = []
+    for item in contract.get("config", {}).get("off_peak_hours") or []:
+        try:
+            start_h, start_m = (int(x) for x in item["start"].split(":"))
+            end_h, end_m = (int(x) for x in item["end"].split(":"))
+        except (KeyError, ValueError, AttributeError):
+            continue
+        start = start_h * 60 + start_m
+        end = end_h * 60 + end_m or 24 * 60
+        if end > start:
+            ranges.append((start, end))
+        else:
+            ranges.extend([(start, 24 * 60), (0, end)])
+    return ranges
+
+
+def _off_peak_fraction(hour_start: datetime, ranges: list[tuple[int, int]]) -> float:
+    """Share of the hour starting at `hour_start` (local) that is off-peak."""
+    start = hour_start.hour * 60 + hour_start.minute
+    end = start + 60
+    overlap = sum(max(0, min(end, r_end) - max(start, r_start)) for r_start, r_end in ranges)
+    return min(overlap, 60) / 60
+
+
+def _day_energy_hours(data: SunologyStreamData) -> list[tuple[datetime, dict[str, Any]]]:
+    """Today's completed hours as (local hour start, values) pairs."""
+    if not data.day_energy:
+        return []
+    hours = []
+    for key, values in (data.day_energy.get("energyAmountsAndCostsByHour") or {}).items():
+        parsed = dt_util.parse_datetime(key)
+        if parsed is None:
+            continue
+        hours.append((dt_util.as_local(parsed), values))
+    return hours
+
+
+def _day_consumption_split(data: SunologyStreamData, off_peak: bool) -> float | None:
+    """Today's grid consumption (kWh) during off-peak or peak hours.
+
+    Hours straddling a tariff change (e.g. 06:00-07:00 with off-peak ending at
+    06:56) are split pro rata, the same way the API prices them.
+    """
+    ranges = _off_peak_ranges(data.contract)
+    if not ranges or data.day_energy is None:
+        return None
+    total = 0.0
+    for hour_start, values in _day_energy_hours(data):
+        fraction = _off_peak_fraction(hour_start, ranges)
+        total += (values.get("consumptionInKWh") or 0) * (fraction if off_peak else 1 - fraction)
+    return round(total, 3)
+
+
+def _day_consumption_cost(data: SunologyStreamData) -> float | None:
+    if data.day_energy is None:
+        return None
+    return round(
+        sum(values.get("consumptionInEuros") or 0 for _, values in _day_energy_hours(data)),
+        2,
+    )
+
+
+# Built on /client/energyAmountsAndCostsForDay, which only lists completed
+# hours: these lag real time by up to an hour, and read 0 just after midnight.
+OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
+    SunologyStreamSensorDescription(
+        key="daily_off_peak_consumption_energy",
+        translation_key="daily_off_peak_consumption_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda data: _day_consumption_split(data, off_peak=True),
+    ),
+    SunologyStreamSensorDescription(
+        key="daily_peak_consumption_energy",
+        translation_key="daily_peak_consumption_energy",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda data: _day_consumption_split(data, off_peak=False),
+    ),
+)
+
+DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
+    key="daily_consumption_cost",
+    translation_key="daily_consumption_cost",
+    device_class=SensorDeviceClass.MONETARY,
+    native_unit_of_measurement=CURRENCY_EURO,
+    value_fn=_day_consumption_cost,
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: SunologyStreamConfigEntry,
@@ -132,6 +238,17 @@ async def async_setup_entry(
         entities.append(
             SunologyStreamSensor(coordinator, entry.entry_id, ERL_LAST_SYNC_DESCRIPTION)
         )
+        entities.append(
+            SunologyStreamSensor(
+                coordinator, entry.entry_id, DAILY_CONSUMPTION_COST_DESCRIPTION
+            )
+        )
+        # Only for peak/off-peak contracts, which carry off-peak hours.
+        if _off_peak_ranges(coordinator.data.contract):
+            entities.extend(
+                SunologyStreamSensor(coordinator, entry.entry_id, description)
+                for description in OFF_PEAK_DESCRIPTIONS
+            )
 
     # Panel list is discovered at setup time from the first coordinator
     # refresh. A panel added to the account later would need a reload of
