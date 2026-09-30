@@ -13,6 +13,8 @@ Les entités sont regroupées par appareil :
 
 Le Lecteur TIC Linky et les panneaux sont reliés à l'Installation Sunology. Sans ERL, les capteurs de consommation restent sur l'appareil Installation Sunology.
 
+Un panneau ajouté dans l'appli Sunology apparaît tout seul, sans recharger l'intégration : ses entités sont créées dès qu'il figure dans l'overview (30 s), ses diagnostics dès que ses détails sont récupérés (rafraîchissement immédiat quand un nouveau panneau apparaît). Un panneau retiré de l'appli passe en « indisponible » ; son appareil peut alors être supprimé depuis sa fiche dans Home Assistant. Les appareils encore présents sur le compte ne peuvent pas être supprimés. Si un panneau supprimé de Home Assistant revient ensuite sur le compte, recharger l'intégration pour recréer ses entités.
+
 Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée, donc avec jusqu'à une heure de retard. Entre minuit et la fin de la première heure, ils affichent encore le total complet de la veille, tranche 23h-minuit comprise, puis repartent de zéro : aucune heure n'est perdue. Les capteurs de coût sont en `state_class: total` avec un `last_reset` sur le jour affiché, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
 
 ## Contexte

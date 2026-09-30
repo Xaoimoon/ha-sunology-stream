@@ -29,7 +29,12 @@ from homeassistant.util import dt as dt_util
 
 from . import SunologyStreamConfigEntry
 from .coordinator import SunologyStreamData, SunologyStreamDataUpdateCoordinator
-from .entity import erl_device_info, installation_device_info, panel_device_info
+from .entity import (
+    SunologyStreamPanelEntity,
+    async_track_panels,
+    erl_device_info,
+    installation_device_info,
+)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -356,31 +361,37 @@ async def async_setup_entry(
                 for description in OFF_PEAK_DESCRIPTIONS
             )
 
-    # Panel list is discovered at setup time from the first coordinator
-    # refresh. A panel added to the account later would need a reload of
-    # this config entry to show up — acceptable for now.
-    panels = coordinator.data.overview.get("production", {}).get("panels", {})
-    for serial_number, panel_data in panels.items():
-        details = coordinator.data.panel_details.get(serial_number)
-        device = panel_device_info(entry.entry_id, serial_number, panel_data, details)
-        entities.extend(
+    async_add_entities(entities)
+
+    def build_panel_entities(
+        serial_number: str, panel_data: dict[str, Any], device: DeviceInfo
+    ) -> list[SensorEntity]:
+        return [
             panel_class(coordinator, entry.entry_id, serial_number, device)
             for panel_class in (
                 SunologyStreamPanelProductionSensor,
                 SunologyStreamPanelBatteryLevelSensor,
                 SunologyStreamPanelBatteryStateSensor,
             )
-        )
-        if details is not None:
-            entities.extend(
-                SunologyStreamPanelDetailSensor(
-                    coordinator, entry.entry_id, serial_number, device, description
-                )
-                for description in PANEL_DETAIL_DESCRIPTIONS
-                if panel_data.get("has_b") or not description.requires_battery
-            )
+        ]
 
-    async_add_entities(entities)
+    def build_detail_entities(
+        serial_number: str,
+        panel_data: dict[str, Any],
+        details: dict[str, Any],
+        device: DeviceInfo,
+    ) -> list[SensorEntity]:
+        return [
+            SunologyStreamPanelDetailSensor(
+                coordinator, entry.entry_id, serial_number, device, description
+            )
+            for description in PANEL_DETAIL_DESCRIPTIONS
+            if panel_data.get("has_b") or not description.requires_battery
+        ]
+
+    async_track_panels(
+        entry, coordinator, async_add_entities, build_panel_entities, build_detail_entities
+    )
 
 
 class SunologyStreamSensor(
@@ -416,12 +427,9 @@ class SunologyStreamSensor(
         return None
 
 
-class SunologyStreamPanelProductionSensor(
-    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
-):
+class SunologyStreamPanelProductionSensor(SunologyStreamPanelEntity, SensorEntity):
     """Production power for a single solar panel."""
 
-    _attr_has_entity_name = True
     _attr_device_class = SensorDeviceClass.POWER
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -434,24 +442,16 @@ class SunologyStreamPanelProductionSensor(
         serial_number: str,
         device_info: DeviceInfo,
     ) -> None:
-        super().__init__(coordinator)
-        self._serial_number = serial_number
-        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_production"
-        self._attr_device_info = device_info
+        super().__init__(coordinator, entry_id, serial_number, device_info, "production")
 
     @property
     def native_value(self) -> Any:
-        panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
-        panel = panels.get(self._serial_number, {})
-        return panel.get("production")
+        return self.panel_data.get("production")
 
 
-class SunologyStreamPanelBatteryLevelSensor(
-    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
-):
+class SunologyStreamPanelBatteryLevelSensor(SunologyStreamPanelEntity, SensorEntity):
     """State of charge for a panel's integrated battery (0 for panels without one)."""
 
-    _attr_has_entity_name = True
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -464,21 +464,14 @@ class SunologyStreamPanelBatteryLevelSensor(
         serial_number: str,
         device_info: DeviceInfo,
     ) -> None:
-        super().__init__(coordinator)
-        self._serial_number = serial_number
-        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_level"
-        self._attr_device_info = device_info
+        super().__init__(coordinator, entry_id, serial_number, device_info, "battery_level")
 
     @property
     def native_value(self) -> Any:
-        panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
-        panel = panels.get(self._serial_number, {})
-        return panel.get("battery")
+        return self.panel_data.get("battery")
 
 
-class SunologyStreamPanelBatteryStateSensor(
-    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
-):
+class SunologyStreamPanelBatteryStateSensor(SunologyStreamPanelEntity, SensorEntity):
     """Raw charge/discharge state for a panel's integrated battery.
 
     Exposed as a plain string (not device_class enum) since the full set of
@@ -486,7 +479,6 @@ class SunologyStreamPanelBatteryStateSensor(
     "DISCHARGING" and "UNPLUGGED" have been observed.
     """
 
-    _attr_has_entity_name = True
     _attr_translation_key = "panel_battery_state"
 
     def __init__(
@@ -496,25 +488,17 @@ class SunologyStreamPanelBatteryStateSensor(
         serial_number: str,
         device_info: DeviceInfo,
     ) -> None:
-        super().__init__(coordinator)
-        self._serial_number = serial_number
-        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_state"
-        self._attr_device_info = device_info
+        super().__init__(coordinator, entry_id, serial_number, device_info, "battery_state")
 
     @property
     def native_value(self) -> Any:
-        panels = self.coordinator.data.overview.get("production", {}).get("panels", {})
-        panel = panels.get(self._serial_number, {})
-        return panel.get("batteryState")
+        return self.panel_data.get("batteryState")
 
 
-class SunologyStreamPanelDetailSensor(
-    CoordinatorEntity[SunologyStreamDataUpdateCoordinator], SensorEntity
-):
+class SunologyStreamPanelDetailSensor(SunologyStreamPanelEntity, SensorEntity):
     """A per-panel diagnostic sensor built on /solar-panels/{id}."""
 
     entity_description: SunologyStreamPanelDetailDescription
-    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -524,15 +508,12 @@ class SunologyStreamPanelDetailSensor(
         device_info: DeviceInfo,
         description: SunologyStreamPanelDetailDescription,
     ) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry_id, serial_number, device_info, description.key)
         self.entity_description = description
-        self._serial_number = serial_number
-        self._attr_unique_id = f"{entry_id}_panel_{serial_number}_{description.key}"
-        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
-        details = self.coordinator.data.panel_details.get(self._serial_number)
+        details = self.panel_details
         if details is None:
             return None
         return self.entity_description.value_fn(details)

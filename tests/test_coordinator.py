@@ -325,3 +325,33 @@ async def test_yesterday_fallback_across_dst_change():
     await update_at(make_coordinator(api), datetime(2026, 10, 26, 0, 1, tzinfo=paris))
 
     assert fake.requested == ["2026-10-25T23:00:00.000Z", "2026-10-24T22:00:00.000Z"]
+
+
+@pytest.mark.asyncio
+async def test_new_panel_triggers_slow_refresh_right_away():
+    api = make_erl_api()
+    api.get_stations_and_storages.return_value = [
+        {"id": "id-a", "serialNumber": "AAAAAAAAAAAA"},
+        {"id": "id-c", "serialNumber": "CCCCCCCCCCCC"},
+    ]
+    api.get_solar_panel.side_effect = lambda panel_id: {"id": panel_id}
+    coordinator = make_coordinator(api)
+    paris = dt_util.get_time_zone("Europe/Paris")
+
+    def overview(*serials):
+        return {"production": {"panels": {s: {} for s in serials}}, "consumptionData": {}}
+
+    api.get_overview.return_value = overview("AAAAAAAAAAAA")
+    await update_at(coordinator, datetime(2026, 9, 26, 12, 0, tzinfo=paris))
+    await update_at(coordinator, datetime(2026, 9, 26, 12, 1, tzinfo=paris))  # throttled
+    assert api.get_stations_and_storages.await_count == 1
+
+    # A panel is added: refreshed at once instead of within 5 minutes.
+    api.get_overview.return_value = overview("AAAAAAAAAAAA", "CCCCCCCCCCCC")
+    data = await update_at(coordinator, datetime(2026, 9, 26, 12, 1, 30, tzinfo=paris))
+    assert api.get_stations_and_storages.await_count == 2
+    assert data.panel_details["CCCCCCCCCCCC"] == {"id": "id-c"}
+
+    # Then throttled again.
+    await update_at(coordinator, datetime(2026, 9, 26, 12, 2, tzinfo=paris))
+    assert api.get_stations_and_storages.await_count == 2
