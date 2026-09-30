@@ -28,6 +28,14 @@
       "reauth_successful": "Reauthentication successful"
     }
   },
+  "device": {
+    "installation": {
+      "name": "Sunology installation"
+    },
+    "erl": {
+      "name": "Linky TIC reader"
+    }
+  },
   "entity": {
     "sensor": {
       "production_power": {
@@ -64,12 +72,36 @@
         "name": "Self-reliance"
       },
       "erl_last_synchronization": {
-        "name": "ERL last synchronization"
+        "name": "Last synchronization"
+      },
+      "panel_production": {
+        "name": "Production"
+      },
+      "panel_battery_level": {
+        "name": "Battery level"
+      },
+      "panel_battery_state": {
+        "name": "Battery state"
+      },
+      "panel_wifi_signal": {
+        "name": "WiFi signal"
+      },
+      "panel_firmware_version": {
+        "name": "Firmware"
+      },
+      "panel_last_synchronization": {
+        "name": "Last synchronization"
+      },
+      "panel_battery_charge_threshold": {
+        "name": "Battery charge threshold"
       }
     },
     "binary_sensor": {
       "erl_connected": {
-        "name": "ERL connected"
+        "name": "Connected"
+      },
+      "panel_battery_preserve_energy": {
+        "name": "Battery preserve energy"
       }
     }
   }

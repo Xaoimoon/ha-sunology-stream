@@ -28,6 +28,14 @@
       "reauth_successful": "Ré-authentification réussie"
     }
   },
+  "device": {
+    "installation": {
+      "name": "Installation Sunology"
+    },
+    "erl": {
+      "name": "Lecteur TIC Linky"
+    }
+  },
   "entity": {
     "sensor": {
       "production_power": {
@@ -64,12 +72,36 @@
         "name": "Taux d'autonomie"
       },
       "erl_last_synchronization": {
-        "name": "Dernière synchronisation ERL"
+        "name": "Dernière synchronisation"
+      },
+      "panel_production": {
+        "name": "Production"
+      },
+      "panel_battery_level": {
+        "name": "Niveau de batterie"
+      },
+      "panel_battery_state": {
+        "name": "État de la batterie"
+      },
+      "panel_wifi_signal": {
+        "name": "Signal WiFi"
+      },
+      "panel_firmware_version": {
+        "name": "Firmware"
+      },
+      "panel_last_synchronization": {
+        "name": "Dernière synchronisation"
+      },
+      "panel_battery_charge_threshold": {
+        "name": "Seuil de charge de la batterie"
       }
     },
     "binary_sensor": {
       "erl_connected": {
-        "name": "ERL connecté"
+        "name": "Connecté"
+      },
+      "panel_battery_preserve_energy": {
+        "name": "Préservation de l'énergie de la batterie"
       }
     }
   }

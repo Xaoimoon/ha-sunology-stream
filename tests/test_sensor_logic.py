@@ -228,8 +228,13 @@ def test_cost_last_reset_follows_the_published_day(sample_data: SunologyStreamDa
     coordinator = MagicMock()
     coordinator.data = sample_data
 
-    cost = SunologyStreamSensor(coordinator, "entry", DAILY_CONSUMPTION_COST_DESCRIPTION)
-    power = SunologyStreamSensor(coordinator, "entry", get_description("consumption_power"))
+    device = MagicMock()
+    cost = SunologyStreamSensor(
+        coordinator, "entry", DAILY_CONSUMPTION_COST_DESCRIPTION, device
+    )
+    power = SunologyStreamSensor(
+        coordinator, "entry", get_description("consumption_power"), device
+    )
 
     assert cost.last_reset == yesterday
     assert power.last_reset is None

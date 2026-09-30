@@ -8,11 +8,13 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import SunologyStreamConfigEntry
 from .coordinator import SunologyStreamDataUpdateCoordinator
+from .entity import erl_device_info, panel_device_info
 
 
 async def async_setup_entry(
@@ -25,14 +27,22 @@ async def async_setup_entry(
 
     entities: list[BinarySensorEntity] = []
     if coordinator.data.erl:
-        entities.append(SunologyStreamErlConnectedBinarySensor(coordinator, entry.entry_id))
+        entities.append(
+            SunologyStreamErlConnectedBinarySensor(
+                coordinator, entry.entry_id, erl_device_info(entry.entry_id, coordinator.data.erl)
+            )
+        )
 
     panels = coordinator.data.overview.get("production", {}).get("panels", {})
     for serial_number, panel_data in panels.items():
-        if panel_data.get("has_b") and serial_number in coordinator.data.panel_details:
+        details = coordinator.data.panel_details.get(serial_number)
+        if panel_data.get("has_b") and details is not None:
             entities.append(
                 SunologyStreamPanelBatteryPreserveBinarySensor(
-                    coordinator, entry.entry_id, serial_number, panel_data.get("surname")
+                    coordinator,
+                    entry.entry_id,
+                    serial_number,
+                    panel_device_info(entry.entry_id, serial_number, panel_data, details),
                 )
             )
 
@@ -49,10 +59,14 @@ class SunologyStreamErlConnectedBinarySensor(
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
     def __init__(
-        self, coordinator: SunologyStreamDataUpdateCoordinator, entry_id: str
+        self,
+        coordinator: SunologyStreamDataUpdateCoordinator,
+        entry_id: str,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry_id}_erl_connected"
+        self._attr_device_info = device_info
 
     @property
     def is_on(self) -> bool | None:
@@ -69,6 +83,7 @@ class SunologyStreamPanelBatteryPreserveBinarySensor(
     """
 
     _attr_has_entity_name = True
+    _attr_translation_key = "panel_battery_preserve_energy"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(
@@ -76,12 +91,12 @@ class SunologyStreamPanelBatteryPreserveBinarySensor(
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         serial_number: str,
-        surname: str | None,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self._serial_number = serial_number
         self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_preserve_energy"
-        self._attr_name = f"{surname or serial_number} battery preserve energy"
+        self._attr_device_info = device_info
 
     @property
     def is_on(self) -> bool | None:

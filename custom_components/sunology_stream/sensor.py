@@ -22,12 +22,14 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import SunologyStreamConfigEntry
 from .coordinator import SunologyStreamData, SunologyStreamDataUpdateCoordinator
+from .entity import erl_device_info, installation_device_info, panel_device_info
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -38,6 +40,9 @@ class SunologyStreamSensorDescription(SensorEntityDescription):
     # For state_class TOTAL sensors that restart from 0 at local midnight:
     # exposes last_reset so long-term statistics handle the daily reset.
     resets_daily: bool = False
+    # Grid-side data measured by the ERL: attached to the ERL device when
+    # the account has one, otherwise to the installation device.
+    on_erl: bool = False
 
 
 SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
@@ -52,6 +57,7 @@ SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="consumption_power",
         translation_key="consumption_power",
+        on_erl=True,
         device_class=SensorDeviceClass.POWER,
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
@@ -60,6 +66,7 @@ SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="grid_purchased_power",
         translation_key="grid_purchased_power",
+        on_erl=True,
         device_class=SensorDeviceClass.POWER,
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
@@ -76,6 +83,7 @@ SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_consumption_energy",
         translation_key="daily_consumption_energy",
+        on_erl=True,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -105,6 +113,7 @@ def _history_watt_value(data: SunologyStreamData, section: str) -> Any:
 ERL_LAST_SYNC_DESCRIPTION = SunologyStreamSensorDescription(
     key="erl_last_synchronization",
     translation_key="erl_last_synchronization",
+    on_erl=True,
     device_class=SensorDeviceClass.TIMESTAMP,
     entity_category=EntityCategory.DIAGNOSTIC,
     value_fn=lambda data: _parse_erl_timestamp(data),
@@ -212,6 +221,7 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_off_peak_consumption_energy",
         translation_key="daily_off_peak_consumption_energy",
+        on_erl=True,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -220,6 +230,7 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_peak_consumption_energy",
         translation_key="daily_peak_consumption_energy",
+        on_erl=True,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -230,6 +241,7 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_off_peak_consumption_cost",
         translation_key="daily_off_peak_consumption_cost",
+        on_erl=True,
         device_class=SensorDeviceClass.MONETARY,
         native_unit_of_measurement=CURRENCY_EURO,
         state_class=SensorStateClass.TOTAL,
@@ -239,6 +251,7 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
     SunologyStreamSensorDescription(
         key="daily_peak_consumption_cost",
         translation_key="daily_peak_consumption_cost",
+        on_erl=True,
         device_class=SensorDeviceClass.MONETARY,
         native_unit_of_measurement=CURRENCY_EURO,
         state_class=SensorStateClass.TOTAL,
@@ -250,6 +263,7 @@ OFF_PEAK_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
 DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
     key="daily_consumption_cost",
     translation_key="daily_consumption_cost",
+    on_erl=True,
     device_class=SensorDeviceClass.MONETARY,
     native_unit_of_measurement=CURRENCY_EURO,
     state_class=SensorStateClass.TOTAL,
@@ -262,7 +276,6 @@ DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
 class SunologyStreamPanelDetailDescription(SensorEntityDescription):
     """Describes a per-panel sensor built on /solar-panels/{id}."""
 
-    name_suffix: str
     value_fn: Callable[[dict[str, Any]], Any]
     # Only created for panels with an integrated battery (overview "has_b").
     requires_battery: bool = False
@@ -275,7 +288,7 @@ def _parse_timestamp(raw: Any) -> datetime | None:
 PANEL_DETAIL_DESCRIPTIONS: tuple[SunologyStreamPanelDetailDescription, ...] = (
     SunologyStreamPanelDetailDescription(
         key="wifi_signal",
-        name_suffix="WiFi signal",
+        translation_key="panel_wifi_signal",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
@@ -284,13 +297,13 @@ PANEL_DETAIL_DESCRIPTIONS: tuple[SunologyStreamPanelDetailDescription, ...] = (
     ),
     SunologyStreamPanelDetailDescription(
         key="firmware_version",
-        name_suffix="firmware",
+        translation_key="panel_firmware_version",
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda details: details.get("firmwareVersion"),
     ),
     SunologyStreamPanelDetailDescription(
         key="last_synchronization",
-        name_suffix="last synchronization",
+        translation_key="panel_last_synchronization",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda details: _parse_timestamp(details.get("lastSynchronizationDate")),
@@ -298,7 +311,7 @@ PANEL_DETAIL_DESCRIPTIONS: tuple[SunologyStreamPanelDetailDescription, ...] = (
     # Grid power above which the battery starts charging (app: 210-450 W).
     SunologyStreamPanelDetailDescription(
         key="battery_charge_threshold",
-        name_suffix="battery charge threshold",
+        translation_key="panel_battery_charge_threshold",
         device_class=SensorDeviceClass.POWER,
         native_unit_of_measurement=UnitOfPower.WATT,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -316,30 +329,30 @@ async def async_setup_entry(
     """Set up Sunology Stream sensors from a config entry."""
     coordinator = entry.runtime_data.coordinator
 
-    entities: list[
-        SunologyStreamSensor
-        | SunologyStreamPanelProductionSensor
-        | SunologyStreamPanelBatteryLevelSensor
-        | SunologyStreamPanelBatteryStateSensor
-        | SunologyStreamPanelDetailSensor
-    ] = [
-        SunologyStreamSensor(coordinator, entry.entry_id, description)
+    installation = installation_device_info(entry.entry_id)
+    erl_device = (
+        erl_device_info(entry.entry_id, coordinator.data.erl)
+        if coordinator.data.erl
+        else installation
+    )
+
+    def device_for(description: SunologyStreamSensorDescription) -> DeviceInfo:
+        return erl_device if description.on_erl else installation
+
+    entities: list[SensorEntity] = [
+        SunologyStreamSensor(coordinator, entry.entry_id, description, device_for(description))
         for description in SENSOR_DESCRIPTIONS
     ]
 
     if coordinator.data.erl:
-        entities.append(
-            SunologyStreamSensor(coordinator, entry.entry_id, ERL_LAST_SYNC_DESCRIPTION)
-        )
-        entities.append(
-            SunologyStreamSensor(
-                coordinator, entry.entry_id, DAILY_CONSUMPTION_COST_DESCRIPTION
-            )
+        entities.extend(
+            SunologyStreamSensor(coordinator, entry.entry_id, description, erl_device)
+            for description in (ERL_LAST_SYNC_DESCRIPTION, DAILY_CONSUMPTION_COST_DESCRIPTION)
         )
         # Only for peak/off-peak contracts, which carry off-peak hours.
         if _off_peak_ranges(coordinator.data.contract):
             entities.extend(
-                SunologyStreamSensor(coordinator, entry.entry_id, description)
+                SunologyStreamSensor(coordinator, entry.entry_id, description, erl_device)
                 for description in OFF_PEAK_DESCRIPTIONS
             )
 
@@ -348,26 +361,20 @@ async def async_setup_entry(
     # this config entry to show up — acceptable for now.
     panels = coordinator.data.overview.get("production", {}).get("panels", {})
     for serial_number, panel_data in panels.items():
-        surname = panel_data.get("surname")
-        entities.append(
-            SunologyStreamPanelProductionSensor(
-                coordinator, entry.entry_id, serial_number, surname
+        details = coordinator.data.panel_details.get(serial_number)
+        device = panel_device_info(entry.entry_id, serial_number, panel_data, details)
+        entities.extend(
+            panel_class(coordinator, entry.entry_id, serial_number, device)
+            for panel_class in (
+                SunologyStreamPanelProductionSensor,
+                SunologyStreamPanelBatteryLevelSensor,
+                SunologyStreamPanelBatteryStateSensor,
             )
         )
-        entities.append(
-            SunologyStreamPanelBatteryLevelSensor(
-                coordinator, entry.entry_id, serial_number, surname
-            )
-        )
-        entities.append(
-            SunologyStreamPanelBatteryStateSensor(
-                coordinator, entry.entry_id, serial_number, surname
-            )
-        )
-        if serial_number in coordinator.data.panel_details:
+        if details is not None:
             entities.extend(
                 SunologyStreamPanelDetailSensor(
-                    coordinator, entry.entry_id, serial_number, surname, description
+                    coordinator, entry.entry_id, serial_number, device, description
                 )
                 for description in PANEL_DETAIL_DESCRIPTIONS
                 if panel_data.get("has_b") or not description.requires_battery
@@ -389,10 +396,12 @@ class SunologyStreamSensor(
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         description: SunologyStreamSensorDescription,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry_id}_{description.key}"
+        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
@@ -416,18 +425,19 @@ class SunologyStreamPanelProductionSensor(
     _attr_device_class = SensorDeviceClass.POWER
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_translation_key = "panel_production"
 
     def __init__(
         self,
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         serial_number: str,
-        surname: str | None,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self._serial_number = serial_number
         self._attr_unique_id = f"{entry_id}_panel_{serial_number}_production"
-        self._attr_name = f"{surname or serial_number} production"
+        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
@@ -445,18 +455,19 @@ class SunologyStreamPanelBatteryLevelSensor(
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_translation_key = "panel_battery_level"
 
     def __init__(
         self,
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         serial_number: str,
-        surname: str | None,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self._serial_number = serial_number
         self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_level"
-        self._attr_name = f"{surname or serial_number} battery level"
+        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
@@ -476,18 +487,19 @@ class SunologyStreamPanelBatteryStateSensor(
     """
 
     _attr_has_entity_name = True
+    _attr_translation_key = "panel_battery_state"
 
     def __init__(
         self,
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         serial_number: str,
-        surname: str | None,
+        device_info: DeviceInfo,
     ) -> None:
         super().__init__(coordinator)
         self._serial_number = serial_number
         self._attr_unique_id = f"{entry_id}_panel_{serial_number}_battery_state"
-        self._attr_name = f"{surname or serial_number} battery state"
+        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
@@ -509,14 +521,14 @@ class SunologyStreamPanelDetailSensor(
         coordinator: SunologyStreamDataUpdateCoordinator,
         entry_id: str,
         serial_number: str,
-        surname: str | None,
+        device_info: DeviceInfo,
         description: SunologyStreamPanelDetailDescription,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._serial_number = serial_number
         self._attr_unique_id = f"{entry_id}_panel_{serial_number}_{description.key}"
-        self._attr_name = f"{surname or serial_number} {description.name_suffix}"
+        self._attr_device_info = device_info
 
     @property
     def native_value(self) -> Any:
