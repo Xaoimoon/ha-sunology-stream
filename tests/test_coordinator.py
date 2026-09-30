@@ -116,6 +116,8 @@ def make_erl_api() -> AsyncMock:
     api.get_erl.return_value = {"state": True}
     api.get_signed_contract.return_value = {"config": {"off_peak_hours": []}}
     api.get_energy_amounts_and_costs_for_day.return_value = {"energyAmountsAndCostsByHour": {}}
+    api.get_selectra_details.return_value = {"features": []}
+    api.get_selectra_prices.return_value = {"prices": [], "next_update": None}
     return api
 
 
@@ -355,3 +357,70 @@ async def test_new_panel_triggers_slow_refresh_right_away():
     # Then throttled again.
     await update_at(coordinator, datetime(2026, 9, 26, 12, 2, tzinfo=paris))
     assert api.get_stations_and_storages.await_count == 2
+
+
+@pytest.mark.asyncio
+async def test_selectra_tariff_refresh_schedule():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    api = make_erl_api()
+    contract = {"config": {"pdl": "0", "off_peak_hours": []}}
+    api.get_signed_contract.return_value = contract
+    api.get_selectra_details.return_value = {"features": [{"key": "price kwh hc"}]}
+    api.get_selectra_prices.return_value = {
+        "prices": [],
+        "next_update": "2026-09-28T02:00:00+02:00",
+    }
+    coordinator = make_coordinator(api)
+
+    data = await update_at(coordinator, datetime(2026, 9, 26, 12, tzinfo=paris))
+    assert data.tariff_details == {"features": [{"key": "price kwh hc"}]}
+    api.get_selectra_details.assert_awaited_once_with(contract["config"])
+    api.get_selectra_prices.assert_awaited_once_with(contract["config"])
+
+    # Later slow refreshes the same day: prices not refetched.
+    await update_at(coordinator, datetime(2026, 9, 26, 12, 6, tzinfo=paris))
+    await update_at(coordinator, datetime(2026, 9, 27, 0, 1, tzinfo=paris))
+    assert api.get_selectra_prices.await_count == 1
+
+    # The contract entered in the app changes: refetched.
+    api.get_signed_contract.return_value = {"config": {"pdl": "0", "power_id": 4}}
+    await update_at(coordinator, datetime(2026, 9, 27, 0, 7, tzinfo=paris))
+    assert api.get_selectra_prices.await_count == 2
+    api.get_selectra_prices.assert_awaited_with({"pdl": "0", "power_id": 4})
+
+    # Selectra's next_update is reached (02:00): refetched.
+    await update_at(coordinator, datetime(2026, 9, 28, 2, 1, tzinfo=paris))
+    assert api.get_selectra_prices.await_count == 3
+
+    # Without a next_update, at least once a day.
+    api.get_selectra_prices.return_value = {"prices": []}
+    await update_at(coordinator, datetime(2026, 9, 28, 2, 7, tzinfo=paris))
+    await update_at(coordinator, datetime(2026, 9, 28, 20, 0, tzinfo=paris))
+    assert api.get_selectra_prices.await_count == 3
+    await update_at(coordinator, datetime(2026, 9, 29, 2, 2, tzinfo=paris))
+    assert api.get_selectra_prices.await_count == 4
+
+
+@pytest.mark.asyncio
+async def test_selectra_tariff_failure_keeps_previous_prices():
+    paris = dt_util.get_time_zone("Europe/Paris")
+    api = make_erl_api()
+    api.get_signed_contract.return_value = {"config": {"pdl": "0"}}
+    api.get_selectra_details.return_value = {"features": ["previous"]}
+    coordinator = make_coordinator(api)
+    await update_at(coordinator, datetime(2026, 9, 26, 12, tzinfo=paris))
+
+    api.get_selectra_details.side_effect = SunologyStreamApiError("500")
+    data = await update_at(coordinator, datetime(2026, 9, 27, 12, 1, tzinfo=paris))
+
+    assert api.get_selectra_details.await_count == 2
+    assert data.tariff_details == {"features": ["previous"]}
+
+
+@pytest.mark.asyncio
+async def test_no_selectra_call_without_contract():
+    api = make_erl_api()
+    api.get_signed_contract.side_effect = SunologyStreamApiError("500")
+    data = await make_coordinator(api)._async_update_data()
+    api.get_selectra_details.assert_not_called()
+    assert data.tariff_details is None

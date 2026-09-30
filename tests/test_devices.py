@@ -39,6 +39,8 @@ def make_data(**overrides) -> SunologyStreamData:
         storage_batteries=[],
         contract=load_fixture("client-signed-contract"),
         day_energy=load_fixture("energy-amounts-and-costs-for-day"),
+        tariff_details=load_fixture("selectra-details"),
+        tariff_prices=load_fixture("selectra-prices"),
         panel_details={
             "AAAAAAAAAAAA": load_fixture("solar-panel"),
             "BBBBBBBBBBBB": {**load_fixture("solar-panel"), "serialNumber": "BBBBBBBBBBBB"},
@@ -152,6 +154,9 @@ async def test_sensors_are_grouped_by_device():
             "contract_off_peak_hours",
             "contract_provider",
             "contract_distributor",
+            "contract_off_peak_price",
+            "contract_peak_price",
+            "current_price",
         },
         # Sunology 1 has a battery: it also gets the charge threshold.
         "AAAAAAAAAAAA": {
@@ -330,3 +335,13 @@ async def test_installation_device_is_kept_when_entry_is_not_loaded():
     assert await async_remove_config_entry_device(
         MagicMock(), entry, device_entry("AAAAAAAAAAAA")
     )
+
+
+@pytest.mark.asyncio
+async def test_price_sensors_need_the_selectra_tariff():
+    entities = await setup_platform(
+        sensor, make_data(tariff_details=None, tariff_prices=None)
+    )
+    for key in ("contract_off_peak_price", "contract_peak_price", "current_price"):
+        assert f"entry_{key}" not in entities
+    assert "entry_contract_pdl" in entities

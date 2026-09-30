@@ -115,6 +115,15 @@
       },
       "contract_distributor": {
         "name": "Grid operator"
+      },
+      "contract_off_peak_price": {
+        "name": "Off-peak price"
+      },
+      "contract_peak_price": {
+        "name": "Peak price"
+      },
+      "current_price": {
+        "name": "Current price"
       }
     },
     "binary_sensor": {

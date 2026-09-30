@@ -27,6 +27,8 @@ from .const import (
     LOGOUT_ENDPOINT,
     ME_ENDPOINT,
     OVERVIEW_ENDPOINT,
+    SELECTRA_DETAILS_ENDPOINT,
+    SELECTRA_PRICES_ENDPOINT,
     SOLAR_PANELS_ENDPOINT,
     STORAGE_BATTERY_ALL_PAIRED_ENDPOINT,
     STREAM_METER_ENDPOINT,
@@ -177,3 +179,22 @@ class SunologyStreamApiClient:
         settings). `panel_id` is the device id, not the serial number.
         """
         return await self._request("GET", f"{SOLAR_PANELS_ENDPOINT}/{panel_id}")  # type: ignore[return-value]
+
+    async def get_selectra_details(self, contract_config: dict[str, Any]) -> dict[str, Any]:
+        """Return the contract's tariff sheet from Selectra: offer, option and
+        `features` (per-kWh prices per period, subscription).
+
+        A POST only because it takes the contract as its body: it's a read,
+        which the app calls whenever it shows the energy rates.
+        """
+        return await self._request(  # type: ignore[return-value]
+            "POST", SELECTRA_DETAILS_ENDPOINT, json=contract_config
+        )
+
+    async def get_selectra_prices(self, contract_config: dict[str, Any]) -> dict[str, Any]:
+        """Return the contract's upcoming price slots from Selectra
+        ({start, end, name, price}), with `currency` and `next_update`.
+        """
+        return await self._request(  # type: ignore[return-value]
+            "POST", SELECTRA_PRICES_ENDPOINT, json=contract_config
+        )

@@ -279,3 +279,58 @@ def test_contract_labels_fall_back_to_the_selectra_options(sample_data: Sunology
 def test_contract_off_peak_hours_formatting(sample_data: SunologyStreamData, ranges, expected):
     sample_data.contract["config"]["off_peak_hours"] = ranges
     assert contract_value("contract_off_peak_hours", sample_data) == expected
+
+
+def with_tariff(data: SunologyStreamData) -> SunologyStreamData:
+    data.tariff_details = load_fixture("selectra-details")
+    data.tariff_prices = load_fixture("selectra-prices")
+    return data
+
+
+def test_unit_prices_from_selectra(sample_data: SunologyStreamData):
+    with_tariff(sample_data)
+    assert contract_value("contract_off_peak_price", sample_data) == 0.1589
+    assert contract_value("contract_peak_price", sample_data) == 0.2142
+
+
+def test_price_sensors_use_the_energy_dashboard_unit():
+    for key in ("contract_off_peak_price", "contract_peak_price", "current_price"):
+        description = next(d for d in CONTRACT_DESCRIPTIONS if d.key == key)
+        assert description.native_unit_of_measurement == "EUR/kWh"
+
+
+@pytest.mark.parametrize(
+    ("now", "expected"),
+    [
+        ("2026-09-26T04:00:00+00:00", 0.1589),  # 06:00 Paris: off-peak
+        ("2026-09-26T04:56:00+00:00", 0.2142),  # 06:56 Paris: peak starts
+        ("2026-09-26T20:55:00+00:00", 0.2142),  # 22:55 Paris
+        ("2026-09-26T20:56:00+00:00", 0.1589),  # 22:56 Paris: off-peak again
+        ("2026-09-28T12:00:00+00:00", None),  # past the last slot
+    ],
+)
+def test_current_price_follows_the_price_slots(sample_data: SunologyStreamData, now, expected):
+    from unittest.mock import patch
+
+    with_tariff(sample_data)
+    with patch.object(dt_util, "utcnow", return_value=dt_util.parse_datetime(now)):
+        assert contract_value("current_price", sample_data) == expected
+
+
+@pytest.mark.usefixtures("paris_time_zone")
+def test_costs_use_the_exact_selectra_prices(sample_data: SunologyStreamData):
+    with_tariff(sample_data)
+    off_peak = get_off_peak_description("daily_off_peak_consumption_cost").value_fn(sample_data)
+    peak = get_off_peak_description("daily_peak_consumption_cost").value_fn(sample_data)
+    total = DAILY_CONSUMPTION_COST_DESCRIPTION.value_fn(sample_data)
+    # 14.219 kWh x 0.1589 and 31.781 kWh x 0.2142, instead of the API's
+    # rounded 16 c / 21 c (2.27 / 6.68 / 8.95).
+    assert off_peak == pytest.approx(2.26, abs=0.001)
+    assert peak == pytest.approx(6.81, abs=0.001)
+    assert total == pytest.approx(9.07, abs=0.001)
+
+
+def test_costs_fall_back_to_api_prices_without_selectra(sample_data: SunologyStreamData):
+    with_tariff(sample_data)
+    sample_data.tariff_details = {"features": []}
+    assert DAILY_CONSUMPTION_COST_DESCRIPTION.value_fn(sample_data) == pytest.approx(8.95)

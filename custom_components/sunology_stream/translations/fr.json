@@ -115,6 +115,15 @@
       },
       "contract_distributor": {
         "name": "Gestionnaire de réseau"
+      },
+      "contract_off_peak_price": {
+        "name": "Prix heures creuses"
+      },
+      "contract_peak_price": {
+        "name": "Prix heures pleines"
+      },
+      "current_price": {
+        "name": "Prix actuel"
       }
     },
     "binary_sensor": {

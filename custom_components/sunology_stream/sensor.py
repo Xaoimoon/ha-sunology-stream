@@ -38,6 +38,10 @@ from .entity import (
 )
 
 
+# ISO 4217 code: the Energy dashboard only accepts prices in "EUR/kWh".
+CURRENCY_EURO_CODE = "EUR"
+
+
 @dataclass(frozen=True, kw_only=True)
 class SunologyStreamSensorDescription(SensorEntityDescription):
     """Describes a Sunology Stream sensor entity."""
@@ -49,6 +53,8 @@ class SunologyStreamSensorDescription(SensorEntityDescription):
     # Grid-side data measured by the ERL: attached to the ERL device when
     # the account has one, otherwise to the installation device.
     on_erl: bool = False
+    # Only created when this holds for the data at setup.
+    requires: Callable[[SunologyStreamData], bool] | None = None
 
 
 SENSOR_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
@@ -180,8 +186,8 @@ def _day_energy_hours(data: SunologyStreamData) -> list[tuple[datetime, dict[str
     return hours
 
 
-def _day_consumption_split(data: SunologyStreamData, off_peak: bool) -> float | None:
-    """Today's grid consumption (kWh) during off-peak or peak hours.
+def _day_consumption_kwh(data: SunologyStreamData, off_peak: bool) -> float | None:
+    """Unrounded today's grid consumption (kWh) during off-peak or peak hours.
 
     Hours straddling a tariff change (e.g. 06:00-07:00 with off-peak ending at
     06:56) are split pro rata, the same way the API prices them.
@@ -193,23 +199,55 @@ def _day_consumption_split(data: SunologyStreamData, off_peak: bool) -> float | 
     for hour_start, values in _day_energy_hours(data):
         fraction = _off_peak_fraction(hour_start, ranges)
         total += (values.get("consumptionInKWh") or 0) * (fraction if off_peak else 1 - fraction)
-    return round(total, 3)
+    return total
+
+
+def _day_consumption_split(data: SunologyStreamData, off_peak: bool) -> float | None:
+    kwh = _day_consumption_kwh(data, off_peak)
+    return None if kwh is None else round(kwh, 3)
+
+
+def _tariff_unit_price(data: SunologyStreamData, off_peak: bool) -> float | None:
+    """Exact off-peak or peak price (EUR/kWh) from the Selectra tariff sheet."""
+    key = "price kwh hc" if off_peak else "price kwh hp"
+    for feature in (data.tariff_details or {}).get("features") or []:
+        if feature.get("type") == "consumption" and feature.get("key") == key:
+            return feature.get("value")
+    return None
+
+
+def _current_unit_price(data: SunologyStreamData) -> float | None:
+    """Price (EUR/kWh) of the Selectra price slot covering the current time."""
+    now = dt_util.utcnow()
+    for slot in (data.tariff_prices or {}).get("prices") or []:
+        start = dt_util.parse_datetime(slot.get("start") or "")
+        end = dt_util.parse_datetime(slot.get("end") or "")
+        if start and end and start <= now < end:
+            return slot.get("price")
+    return None
 
 
 def _day_consumption_cost(
     data: SunologyStreamData, off_peak: bool | None = None
 ) -> float | None:
-    """Today's grid consumption cost (EUR), as priced by the API.
+    """Today's grid consumption cost (EUR).
 
-    With `off_peak` set, only the off-peak (True) or peak (False) share. The
-    two hours straddling a tariff change are split by duration, which is off
-    by less than a cent a day compared to pricing each part separately.
+    With the Selectra off-peak and peak prices, each tariff's kWh times its
+    exact price. Otherwise the API's own hourly costs, whose prices are
+    rounded to the cent (e.g. 16 c instead of 15.89 c): then with `off_peak`
+    set, each hour's cost is split between the tariffs by duration.
     """
     if data.day_energy is None:
         return None
     ranges = _off_peak_ranges(data.contract)
     if off_peak is not None and not ranges:
         return None
+    prices = {tariff: _tariff_unit_price(data, tariff) for tariff in (True, False)}
+    if ranges and None not in prices.values():
+        tariffs = (True, False) if off_peak is None else (off_peak,)
+        return round(
+            sum(_day_consumption_kwh(data, tariff) * prices[tariff] for tariff in tariffs), 2
+        )
     total = 0.0
     for hour_start, values in _day_energy_hours(data):
         cost = values.get("consumptionInEuros") or 0
@@ -375,6 +413,32 @@ CONTRACT_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
         value_fn=_contract_off_peak_hours,
     ),
     SunologyStreamSensorDescription(
+        key="contract_off_peak_price",
+        translation_key="contract_off_peak_price",
+        native_unit_of_measurement=f"{CURRENCY_EURO_CODE}/{UnitOfEnergy.KILO_WATT_HOUR}",
+        on_erl=True,
+        requires=lambda data: _tariff_unit_price(data, True) is not None,
+        value_fn=lambda data: _tariff_unit_price(data, True),
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_peak_price",
+        translation_key="contract_peak_price",
+        native_unit_of_measurement=f"{CURRENCY_EURO_CODE}/{UnitOfEnergy.KILO_WATT_HOUR}",
+        on_erl=True,
+        requires=lambda data: _tariff_unit_price(data, False) is not None,
+        value_fn=lambda data: _tariff_unit_price(data, False),
+    ),
+    # Follows the Selectra price slots: usable as the Energy dashboard's
+    # "entity with current price" for any time-of-use contract.
+    SunologyStreamSensorDescription(
+        key="current_price",
+        translation_key="current_price",
+        native_unit_of_measurement=f"{CURRENCY_EURO_CODE}/{UnitOfEnergy.KILO_WATT_HOUR}",
+        on_erl=True,
+        requires=lambda data: bool((data.tariff_prices or {}).get("prices")),
+        value_fn=_current_unit_price,
+    ),
+    SunologyStreamSensorDescription(
         key="contract_provider",
         translation_key="contract_provider",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -481,6 +545,7 @@ async def async_setup_entry(
         entities.extend(
             SunologyStreamSensor(coordinator, entry.entry_id, description, device_for(description))
             for description in CONTRACT_DESCRIPTIONS
+            if description.requires is None or description.requires(coordinator.data)
         )
 
     async_add_entities(entities)
