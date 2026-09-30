@@ -6,6 +6,13 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût, diagnostics par panneau : WiFi, firmware, dernière synchro, seuil et mode de la batterie), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
 
+Les entités sont regroupées par appareil :
+- **Installation Sunology** (un par compte) : puissance de production totale, énergie produite du jour, taux d'autonomie ;
+- **Lecteur TIC Linky** (si le compte a un ERL) : puissances de consommation et d'achat au réseau, énergie consommée du jour, heures creuses/pleines, coûts, état et dernière synchro de l'ERL ;
+- **un appareil par panneau** (modèle, n° de série, firmware) : production, batterie, diagnostics.
+
+Le Lecteur TIC Linky et les panneaux sont reliés à l'Installation Sunology. Sans ERL, les capteurs de consommation restent sur l'appareil Installation Sunology.
+
 Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée, donc avec jusqu'à une heure de retard. Entre minuit et la fin de la première heure, ils affichent encore le total complet de la veille, tranche 23h-minuit comprise, puis repartent de zéro : aucune heure n'est perdue. Les capteurs de coût sont en `state_class: total` avec un `last_reset` sur le jour affiché, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
 
 ## Contexte
