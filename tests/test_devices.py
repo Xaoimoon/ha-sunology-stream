@@ -145,6 +145,13 @@ async def test_sensors_are_grouped_by_device():
             "daily_peak_consumption_energy",
             "daily_off_peak_consumption_cost",
             "daily_peak_consumption_cost",
+            "contract_pdl",
+            "contract_offer",
+            "contract_option",
+            "contract_subscribed_power",
+            "contract_off_peak_hours",
+            "contract_provider",
+            "contract_distributor",
         },
         # Sunology 1 has a battery: it also gets the charge threshold.
         "AAAAAAAAAAAA": {

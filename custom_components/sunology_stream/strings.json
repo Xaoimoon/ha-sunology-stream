@@ -94,6 +94,27 @@
       },
       "panel_battery_charge_threshold": {
         "name": "Battery charge threshold"
+      },
+      "contract_pdl": {
+        "name": "Delivery point (PDL)"
+      },
+      "contract_offer": {
+        "name": "Electricity offer"
+      },
+      "contract_option": {
+        "name": "Tariff option"
+      },
+      "contract_subscribed_power": {
+        "name": "Subscribed power"
+      },
+      "contract_off_peak_hours": {
+        "name": "Off-peak hours"
+      },
+      "contract_provider": {
+        "name": "Electricity provider"
+      },
+      "contract_distributor": {
+        "name": "Grid operator"
       }
     },
     "binary_sensor": {

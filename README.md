@@ -8,7 +8,7 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires et le le
 
 Les entités sont regroupées par appareil :
 - **Installation Sunology** (un par compte) : puissance de production totale, énergie produite du jour, taux d'autonomie ;
-- **Lecteur TIC Linky** (si le compte a un ERL) : puissances de consommation et d'achat au réseau, énergie consommée du jour, heures creuses/pleines, coûts, état et dernière synchro de l'ERL ;
+- **Lecteur TIC Linky** (si le compte a un ERL) : puissances de consommation et d'achat au réseau, énergie consommée du jour, heures creuses/pleines, coûts, état et dernière synchro de l'ERL, et en diagnostic le contrat saisi dans l'appli : PDL, offre, option tarifaire, puissance souscrite, heures creuses, fournisseur, gestionnaire de réseau ;
 - **un appareil par panneau** (modèle, n° de série, firmware) : production, batterie, diagnostics.
 
 Le Lecteur TIC Linky et les panneaux sont reliés à l'Installation Sunology. Sans ERL, les capteurs de consommation restent sur l'appareil Installation Sunology.
@@ -45,7 +45,7 @@ Base URL : `https://backend-mobile.stream.sunology.eu`
 - `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
 - `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations horaires du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
 - `GET /api/client/energyAmountsAndCostsForDay?zone=&day=` — `day` = minuit local en ISO UTC (`2026-09-25T22:00:00.000Z`). Par heure terminée (clé = heure UTC) : `consumptionInKWh`/`consumptionInEuros`, `productionInKWh`, `energySoldInKWh`, `dischargeInKWh`, et `priceCentsPerKWh` (tarif HC/HP du contrat, au prorata pour les heures à cheval sur un changement de tarif). Renvoie une 500 tant qu'aucune heure du jour n'est terminée (juste après minuit), puis les 24 heures du jour, à 0 pour celles qui ne sont pas terminées.
-- `GET /api/client/clientSignedContract` — contrat d'électricité (offre, option, puissance, `off_peak_hours` : plages d'heures creuses).
+- `GET /api/client/clientSignedContract` — contrat d'électricité saisi dans l'appli (Paramètres > Tarifs énergie). `config` : `pdl`, `offer_name`, `option_name`, `off_peak_hours` (plages d'heures creuses, coupées à minuit), `distributor_name`, et des identifiants (`power_id`, `provider_id`…) dont les libellés (« 9 kVA », « EDF »…) sont dans `questionsForSelectra.<champ>.options`.
 - `GET /api/client/electricityCosts?zone=` — cumuls achetés/produits/économisés en kWh et en euros.
 - `POST /api/overview`
 
