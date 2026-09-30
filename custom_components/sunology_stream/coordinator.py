@@ -87,6 +87,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self._panel_details: dict[str, dict[str, Any]] = {}
         self._slow_refreshed_at: datetime | None = None
         self._slow_refreshed_day: str | None = None
+        self._slow_refreshed_panels: set[str] = set()
 
     async def _async_update_data(self) -> SunologyStreamData:
         try:
@@ -139,7 +140,8 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self, now: datetime, zone: str, has_erl: bool, panel_serials: set[str]
     ) -> None:
         """Refresh the contract, today's hourly energy and the panel details, at most every
-        SLOW_SCAN_INTERVAL (and right away when the local day changes).
+        SLOW_SCAN_INTERVAL (and right away when the local day changes or a
+        panel is added to the account, so its entities show up quickly).
 
         These endpoints are best-effort: a failure keeps the previous values
         instead of failing the whole update, so live power keeps working.
@@ -149,6 +151,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             self._slow_refreshed_at is not None
             and now - self._slow_refreshed_at < SLOW_SCAN_INTERVAL
             and day == self._slow_refreshed_day
+            and panel_serials <= self._slow_refreshed_panels
         ):
             return
 
@@ -166,6 +169,7 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
 
         self._slow_refreshed_at = now
         self._slow_refreshed_day = day
+        self._slow_refreshed_panels = panel_serials
 
     async def _async_refresh_day_energy(self, now: datetime, zone: str) -> None:
         """Refresh the hourly energy/costs of today, or finish yesterday's.

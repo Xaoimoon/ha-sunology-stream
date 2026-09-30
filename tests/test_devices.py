@@ -8,7 +8,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from custom_components.sunology_stream import binary_sensor, sensor
+from custom_components.sunology_stream import (
+    async_remove_config_entry_device,
+    binary_sensor,
+    sensor,
+)
 from custom_components.sunology_stream.const import DOMAIN
 from custom_components.sunology_stream.coordinator import SunologyStreamData
 from custom_components.sunology_stream.entity import (
@@ -44,14 +48,37 @@ def make_data(**overrides) -> SunologyStreamData:
     return SunologyStreamData(**data)
 
 
+class FakePlatform:
+    """Runs a platform's async_setup_entry and records what it adds."""
+
+    def __init__(self, platform, data: SunologyStreamData) -> None:
+        self.platform = platform
+        self.entry = MagicMock()
+        self.entry.entry_id = "entry"
+        self.coordinator = self.entry.runtime_data.coordinator
+        self.coordinator.data = data
+        self.coordinator.last_update_success = True
+        self.batches: list[list] = []
+
+    async def setup(self) -> dict:
+        await self.platform.async_setup_entry(MagicMock(), self.entry, self.batches.append)
+        return self.entities
+
+    @property
+    def entities(self) -> dict:
+        return {entity.unique_id: entity for batch in self.batches for entity in batch}
+
+    def refresh(self, data: SunologyStreamData) -> list:
+        """Simulate a coordinator update; return the entities it added."""
+        self.coordinator.data = data
+        before = len(self.batches)
+        (listener,) = [c.args[0] for c in self.coordinator.async_add_listener.call_args_list]
+        listener()
+        return [entity for batch in self.batches[before:] for entity in batch]
+
+
 async def setup_platform(platform, data: SunologyStreamData) -> dict:
-    """Run a platform's async_setup_entry and index the entities by unique_id."""
-    entry = MagicMock()
-    entry.entry_id = "entry"
-    entry.runtime_data.coordinator.data = data
-    entities = []
-    await platform.async_setup_entry(MagicMock(), entry, entities.extend)
-    return {entity.unique_id: entity for entity in entities}
+    return await FakePlatform(platform, data).setup()
 
 
 def device_id(entity) -> str:
@@ -175,3 +202,124 @@ async def test_every_entity_has_a_translated_name(platform):
             assert key in strings["entity"][domain], (path, key)
         for device_key in ("installation", "erl"):
             assert device_key in strings["device"], (path, device_key)
+
+
+def with_panel_c(data: SunologyStreamData, with_details: bool) -> SunologyStreamData:
+    """The same account after adding a third panel (with a battery)."""
+    overview = json.loads(json.dumps(data.overview))
+    overview["production"]["panels"]["CCCCCCCCCCCC"] = {
+        "surname": "Sunology 3",
+        "production": 120,
+        "battery": 50,
+        "has_b": True,
+        "panelType": "PLAY_MAX",
+    }
+    details = dict(data.panel_details)
+    if with_details:
+        details["CCCCCCCCCCCC"] = {**load_fixture("solar-panel"), "rssiWifi": -50.0}
+    return make_data(overview=overview, panel_details=details)
+
+
+@pytest.mark.asyncio
+async def test_new_panel_entities_are_added_without_reload():
+    fake = FakePlatform(sensor, make_data())
+    await fake.setup()
+    count = len(fake.entities)
+
+    # The panel shows up in the overview first: its overview-based entities.
+    added = fake.refresh(with_panel_c(make_data(), with_details=False))
+    assert {e.unique_id for e in added} == {
+        "entry_panel_CCCCCCCCCCCC_production",
+        "entry_panel_CCCCCCCCCCCC_battery_level",
+        "entry_panel_CCCCCCCCCCCC_battery_state",
+    }
+    assert added[0].device_info["name"] == "Sunology 3"
+    assert added[0].native_value == 120
+
+    # Its details come with the next slow refresh: the diagnostics.
+    added = fake.refresh(with_panel_c(make_data(), with_details=True))
+    assert {e.unique_id for e in added} == {
+        f"entry_panel_CCCCCCCCCCCC_{key}"
+        for key in (
+            "wifi_signal",
+            "firmware_version",
+            "last_synchronization",
+            "battery_charge_threshold",
+        )
+    }
+    assert fake.entities["entry_panel_CCCCCCCCCCCC_wifi_signal"].native_value == -50.0
+
+    # Nothing is added twice.
+    assert fake.refresh(with_panel_c(make_data(), with_details=True)) == []
+    assert len(fake.entities) == count + 7
+
+
+@pytest.mark.asyncio
+async def test_new_panel_binary_sensor_is_added_without_reload():
+    fake = FakePlatform(binary_sensor, make_data())
+    await fake.setup()
+    assert fake.refresh(with_panel_c(make_data(), with_details=False)) == []
+    added = fake.refresh(with_panel_c(make_data(), with_details=True))
+    assert [e.unique_id for e in added] == [
+        "entry_panel_CCCCCCCCCCCC_battery_preserve_energy"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_removed_panel_entities_become_unavailable():
+    fake = FakePlatform(sensor, make_data())
+    entities = await fake.setup()
+    production = entities["entry_panel_AAAAAAAAAAAA_production"]
+    assert production.available
+
+    overview = json.loads(json.dumps(fake.coordinator.data.overview))
+    del overview["production"]["panels"]["AAAAAAAAAAAA"]
+    fake.refresh(make_data(overview=overview))
+
+    assert not production.available
+    assert entities["entry_panel_BBBBBBBBBBBB_production"].available
+
+
+def device_entry(identifier: str) -> MagicMock:
+    device = MagicMock()
+    device.identifiers = {(DOMAIN, identifier)}
+    return device
+
+
+def loaded_entry(data: SunologyStreamData) -> MagicMock:
+    entry = MagicMock()
+    entry.entry_id = "entry"
+    entry.runtime_data.coordinator.data = data
+    return entry
+
+
+@pytest.mark.asyncio
+async def test_only_devices_gone_from_the_account_can_be_removed():
+    entry = loaded_entry(make_data())
+    for current in ("entry", "000000000000", "AAAAAAAAAAAA", "BBBBBBBBBBBB"):
+        assert not await async_remove_config_entry_device(
+            MagicMock(), entry, device_entry(current)
+        ), current
+    assert await async_remove_config_entry_device(
+        MagicMock(), entry, device_entry("CCCCCCCCCCCC")
+    )
+
+
+@pytest.mark.asyncio
+async def test_erl_device_can_be_removed_once_unlinked():
+    entry = loaded_entry(make_data(erl=None))
+    assert await async_remove_config_entry_device(
+        MagicMock(), entry, device_entry("000000000000")
+    )
+
+
+@pytest.mark.asyncio
+async def test_installation_device_is_kept_when_entry_is_not_loaded():
+    entry = MagicMock(spec=["entry_id"])
+    entry.entry_id = "entry"
+    assert not await async_remove_config_entry_device(
+        MagicMock(), entry, device_entry("entry")
+    )
+    assert await async_remove_config_entry_device(
+        MagicMock(), entry, device_entry("AAAAAAAAAAAA")
+    )

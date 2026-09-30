@@ -8,13 +8,16 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers.device_registry import DeviceEntry
 
 from .api import (
     SunologyStreamApiClient,
     SunologyStreamAuthError,
     SunologyStreamConnectionError,
 )
+from .const import DOMAIN
 from .coordinator import SunologyStreamDataUpdateCoordinator
+from .entity import live_device_identifiers
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -63,3 +66,21 @@ async def async_unload_entry(hass: HomeAssistant, entry: SunologyStreamConfigEnt
     if unloaded:
         await entry.runtime_data.api.close()
     return unloaded
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: SunologyStreamConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Allow removing a device only once it's gone from the account, e.g. a
+    panel removed in the Sunology app. Current devices would come back anyway.
+    """
+    runtime_data = getattr(entry, "runtime_data", None)
+    if runtime_data is None:
+        # Entry not loaded: only protect the installation device.
+        live = {entry.entry_id}
+    else:
+        live = live_device_identifiers(entry.entry_id, runtime_data.coordinator.data)
+    return not any(
+        domain == DOMAIN and identifier in live
+        for domain, identifier in device_entry.identifiers
+    )
