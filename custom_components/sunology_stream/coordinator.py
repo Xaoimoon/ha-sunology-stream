@@ -19,7 +19,7 @@ from .api import (
     SunologyStreamAuthError,
     SunologyStreamConnectionError,
 )
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, SLOW_SCAN_INTERVAL
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, SLOW_SCAN_INTERVAL, TARIFF_MAX_AGE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +44,9 @@ class SunologyStreamData:
     # Local midnight of the day `day_energy` covers. Usually today, but
     # yesterday between midnight and the end of today's first hour.
     day_energy_start: datetime | None = None
+    # Selectra tariff sheet (unit prices) and price slots for the contract.
+    tariff_details: dict[str, Any] | None = None
+    tariff_prices: dict[str, Any] | None = None
     # Per-panel details from /solar-panels/{id}, keyed by serial number.
     panel_details: dict[str, dict[str, Any]] = field(default_factory=dict)
 
@@ -85,6 +88,11 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self._day_energy: dict[str, Any] | None = None
         self._day_energy_start: datetime | None = None
         self._panel_details: dict[str, dict[str, Any]] = {}
+        self._tariff_details: dict[str, Any] | None = None
+        self._tariff_prices: dict[str, Any] | None = None
+        self._tariff_contract: dict[str, Any] | None = None
+        self._tariff_fetched_at: datetime | None = None
+        self._tariff_next_update: datetime | None = None
         self._slow_refreshed_at: datetime | None = None
         self._slow_refreshed_day: str | None = None
         self._slow_refreshed_panels: set[str] = set()
@@ -133,6 +141,8 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
             contract=self._contract,
             day_energy=self._day_energy,
             day_energy_start=self._day_energy_start,
+            tariff_details=self._tariff_details,
+            tariff_prices=self._tariff_prices,
             panel_details=dict(self._panel_details),
         )
 
@@ -162,6 +172,8 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         except SunologyStreamApiError as err:
             _LOGGER.debug("Cannot fetch the signed contract: %s", err)
 
+        await self._async_refresh_tariff(now)
+
         if has_erl:
             await self._async_refresh_day_energy(now, zone)
 
@@ -170,6 +182,44 @@ class SunologyStreamDataUpdateCoordinator(DataUpdateCoordinator[SunologyStreamDa
         self._slow_refreshed_at = now
         self._slow_refreshed_day = day
         self._slow_refreshed_panels = panel_serials
+
+    async def _async_refresh_tariff(self, now: datetime) -> None:
+        """Refresh the Selectra unit prices of the contract when they may have
+        changed: at their "next_update", when the contract entered in the app
+        changes, and at least every TARIFF_MAX_AGE. A failure keeps the
+        previous prices and is retried at the next slow refresh.
+        """
+        config = self._contract.get("config") if isinstance(self._contract, dict) else None
+        if not isinstance(config, dict) or not config:
+            return
+        if (
+            self._tariff_fetched_at is not None
+            and config == self._tariff_contract
+            and now - self._tariff_fetched_at < TARIFF_MAX_AGE
+            and (self._tariff_next_update is None or now < self._tariff_next_update)
+        ):
+            return
+        try:
+            details = await self.api.get_selectra_details(config)
+            prices = await self.api.get_selectra_prices(config)
+        except SunologyStreamAuthError:
+            raise
+        except SunologyStreamApiError as err:
+            _LOGGER.debug("Cannot fetch the Selectra tariff: %s", err)
+            return
+        self._tariff_details = details
+        self._tariff_prices = prices
+        self._tariff_contract = config
+        self._tariff_fetched_at = now
+        next_update = (prices or {}).get("next_update")
+        next_update_at = (
+            dt_util.parse_datetime(next_update) if isinstance(next_update, str) else None
+        )
+        # A next_update already past would mean refetching every slow refresh:
+        # rely on TARIFF_MAX_AGE instead.
+        self._tariff_next_update = (
+            next_update_at if next_update_at is not None and next_update_at > now else None
+        )
 
     async def _async_refresh_day_energy(self, now: datetime, zone: str) -> None:
         """Refresh the hourly energy/costs of today, or finish yesterday's.

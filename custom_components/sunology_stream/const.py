@@ -20,6 +20,8 @@ DEVICES_ACCESSORIES_ENDPOINT = "/devices/accessories"
 SOLAR_PANELS_ENDPOINT = "/solar-panels"
 HISTORY_ENDPOINT = "/history"
 CLIENT_SIGNED_CONTRACT_ENDPOINT = "/client/clientSignedContract"
+SELECTRA_DETAILS_ENDPOINT = "/selectra/planning/details"
+SELECTRA_PRICES_ENDPOINT = "/selectra/planning/prices"
 ENERGY_AMOUNTS_AND_COSTS_FOR_DAY_ENDPOINT = "/client/energyAmountsAndCostsForDay"
 
 # The "zone" query param is the UTC offset in hours, as the app sends it
@@ -36,3 +38,6 @@ DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
 # Hourly per-tariff energy, the contract and per-panel diagnostics change
 # rarely, so they are refreshed less often than the live power data.
 SLOW_SCAN_INTERVAL = timedelta(minutes=5)
+# Selectra unit prices are refetched at their "next_update", when the
+# contract changes, and at least this often.
+TARIFF_MAX_AGE = timedelta(hours=24)

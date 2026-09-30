@@ -1,0 +1,78 @@
+{
+  "category": "time_of_use",
+  "offer": {
+    "name": {
+      "fr": "Tarif bleu résidentiel"
+    },
+    "type": "Variable",
+    "provider_name": "EDF",
+    "logo": "https://images.selectra.com/fr-energy/logos/edf-xs.png"
+  },
+  "option": {
+    "name": "Heures pleines heures creuses",
+    "slug": "hphc",
+    "period_set_name": null,
+    "description": "Le prix est plus faible 8 heures par jour, fixées par le gestionnaire du réseau de distribution au niveau de votre logement."
+  },
+  "tier": null,
+  "features": [
+    {
+      "name": "Abonnement",
+      "key": "subscription hphc",
+      "type": "subscription",
+      "value": 19.88,
+      "weight": 1,
+      "unit": "€/mois ou €/an",
+      "display_order": 1,
+      "period_names": [],
+      "distributor_reference": null
+    },
+    {
+      "name": "Heures Pleines",
+      "key": "price kwh hp",
+      "type": "consumption",
+      "value": 0.2142,
+      "weight": 0.66667,
+      "unit": "€/kWh",
+      "display_order": 2,
+      "period_names": [],
+      "distributor_reference": "2"
+    },
+    {
+      "name": "Heures Creuses",
+      "key": "price kwh hc",
+      "type": "consumption",
+      "value": 0.1589,
+      "weight": 0.33333,
+      "unit": "€/kWh",
+      "display_order": 3,
+      "period_names": [],
+      "distributor_reference": "1"
+    }
+  ],
+  "distributor": {
+    "name": "Enedis"
+  },
+  "distributor_off_peak_hours": {
+    "current": [
+      {
+        "start": "22:56",
+        "end": "00:00"
+      },
+      {
+        "start": "00:00",
+        "end": "06:56"
+      }
+    ],
+    "future": [
+      {
+        "start": "00:52",
+        "end": "05:52"
+      },
+      {
+        "start": "13:52",
+        "end": "16:52"
+      }
+    ]
+  }
+}
