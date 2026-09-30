@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -277,6 +278,119 @@ DAILY_CONSUMPTION_COST_DESCRIPTION = SunologyStreamSensorDescription(
 )
 
 
+def _contract_config(data: SunologyStreamData) -> dict[str, Any]:
+    return (data.contract or {}).get("config") or {}
+
+
+def _contract_choice(data: SunologyStreamData, field: str) -> str | None:
+    """Label of a contract field stored as an id, e.g. provider_id 16 -> "EDF",
+    looked up in the Selectra form options that come with the contract.
+    """
+    value = _contract_config(data).get(field)
+    if value is None:
+        return None
+    options = (
+        ((data.contract or {}).get("questionsForSelectra") or {}).get(field, {}).get("options")
+        or {}
+    )
+    return options.get(str(value))
+
+
+def _contract_offer(data: SunologyStreamData) -> str | None:
+    """Offer name, given per language ({"fr": "Tarif bleu résidentiel"})."""
+    name = _contract_config(data).get("offer_name")
+    if isinstance(name, dict):
+        return name.get("fr") or next(iter(name.values()), None)
+    return name or _contract_choice(data, "offer_id")
+
+
+def _contract_subscribed_power(data: SunologyStreamData) -> float | None:
+    """Subscribed power in kVA, from its label (e.g. "9 kVA")."""
+    label = _contract_choice(data, "power_id")
+    match = re.match(r"\s*(\d+(?:[.,]\d+)?)\s*kVA", label or "")
+    return float(match.group(1).replace(",", ".")) if match else None
+
+
+def _contract_off_peak_hours(data: SunologyStreamData) -> str | None:
+    """Off-peak hours as "22:56-06:56", ranges split at midnight merged back."""
+    ranges = sorted(_off_peak_ranges(data.contract))
+    if not ranges:
+        return None
+    merged: list[list[int]] = []
+    for start, end in ranges:
+        if merged and merged[-1][1] == start:
+            merged[-1][1] = end
+        else:
+            merged.append([start, end])
+    if len(merged) > 1 and merged[0][0] == 0 and merged[-1][1] == 24 * 60:
+        # 22:56-24:00 followed by 00:00-06:56 is a single overnight range.
+        merged[0][0] = merged.pop()[0]
+
+    def fmt(minutes: int) -> str:
+        return f"{minutes // 60 % 24:02d}:{minutes % 60:02d}"
+
+    return ", ".join(f"{fmt(start)}-{fmt(end)}" for start, end in merged)
+
+
+# From /client/clientSignedContract, i.e. what was entered in the app's
+# "Energy rates" settings. Shown on the Linky TIC reader device.
+CONTRACT_DESCRIPTIONS: tuple[SunologyStreamSensorDescription, ...] = (
+    SunologyStreamSensorDescription(
+        key="contract_pdl",
+        translation_key="contract_pdl",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=lambda data: _contract_config(data).get("pdl"),
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_offer",
+        translation_key="contract_offer",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=_contract_offer,
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_option",
+        translation_key="contract_option",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=lambda data: _contract_config(data).get("option_name")
+        or _contract_choice(data, "option_id"),
+    ),
+    # A plain kVA number rather than device_class apparent_power, whose kVA
+    # unit only exists in recent Home Assistant versions.
+    SunologyStreamSensorDescription(
+        key="contract_subscribed_power",
+        translation_key="contract_subscribed_power",
+        native_unit_of_measurement="kVA",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=_contract_subscribed_power,
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_off_peak_hours",
+        translation_key="contract_off_peak_hours",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=_contract_off_peak_hours,
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_provider",
+        translation_key="contract_provider",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=lambda data: _contract_choice(data, "provider_id"),
+    ),
+    SunologyStreamSensorDescription(
+        key="contract_distributor",
+        translation_key="contract_distributor",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        on_erl=True,
+        value_fn=lambda data: _contract_config(data).get("distributor_name"),
+    ),
+)
+
+
 @dataclass(frozen=True, kw_only=True)
 class SunologyStreamPanelDetailDescription(SensorEntityDescription):
     """Describes a per-panel sensor built on /solar-panels/{id}."""
@@ -360,6 +474,14 @@ async def async_setup_entry(
                 SunologyStreamSensor(coordinator, entry.entry_id, description, erl_device)
                 for description in OFF_PEAK_DESCRIPTIONS
             )
+
+    # The contract (PDL, offer, ...) is set in the app; on the Linky TIC
+    # reader device, or the installation one for accounts without an ERL.
+    if _contract_config(coordinator.data):
+        entities.extend(
+            SunologyStreamSensor(coordinator, entry.entry_id, description, device_for(description))
+            for description in CONTRACT_DESCRIPTIONS
+        )
 
     async_add_entities(entities)
 

@@ -18,6 +18,7 @@ from custom_components.sunology_stream.sensor import (
     DAILY_CONSUMPTION_COST_DESCRIPTION,
     ERL_LAST_SYNC_DESCRIPTION,
     OFF_PEAK_DESCRIPTIONS,
+    CONTRACT_DESCRIPTIONS,
     PANEL_DETAIL_DESCRIPTIONS,
     SENSOR_DESCRIPTIONS,
     _off_peak_ranges,
@@ -238,3 +239,43 @@ def test_cost_last_reset_follows_the_published_day(sample_data: SunologyStreamDa
 
     assert cost.last_reset == yesterday
     assert power.last_reset is None
+
+
+def contract_value(key: str, data: SunologyStreamData):
+    return next(d for d in CONTRACT_DESCRIPTIONS if d.key == key).value_fn(data)
+
+
+def test_contract_values(sample_data: SunologyStreamData):
+    assert contract_value("contract_pdl", sample_data) == "00000000000000"
+    assert contract_value("contract_offer", sample_data) == "Tarif bleu résidentiel"
+    assert contract_value("contract_option", sample_data) == "Heures pleines heures creuses"
+    assert contract_value("contract_subscribed_power", sample_data) == 9.0
+    assert contract_value("contract_off_peak_hours", sample_data) == "22:56-06:56"
+    assert contract_value("contract_provider", sample_data) == "EDF"
+    assert contract_value("contract_distributor", sample_data) == "Enedis"
+
+
+def test_contract_values_without_contract(sample_data: SunologyStreamData):
+    sample_data.contract = None
+    for description in CONTRACT_DESCRIPTIONS:
+        assert description.value_fn(sample_data) is None, description.key
+
+
+def test_contract_labels_fall_back_to_the_selectra_options(sample_data: SunologyStreamData):
+    config = sample_data.contract["config"]
+    del config["offer_name"], config["option_name"]
+    assert contract_value("contract_offer", sample_data) == "Tarif bleu résidentiel"
+    assert contract_value("contract_option", sample_data) == "Heures pleines heures creuses"
+
+
+@pytest.mark.parametrize(
+    ("ranges", "expected"),
+    [
+        ([{"start": "22:56", "end": "00:00"}, {"start": "00:00", "end": "06:56"}], "22:56-06:56"),
+        ([{"start": "22:00", "end": "06:00"}], "22:00-06:00"),
+        ([{"start": "02:00", "end": "07:00"}, {"start": "13:00", "end": "16:00"}], "02:00-07:00, 13:00-16:00"),
+    ],
+)
+def test_contract_off_peak_hours_formatting(sample_data: SunologyStreamData, ranges, expected):
+    sample_data.contract["config"]["off_peak_hours"] = ranges
+    assert contract_value("contract_off_peak_hours", sample_data) == expected
