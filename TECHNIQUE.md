@@ -56,9 +56,9 @@ Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un 
 
 ## Développement
 
-Un devcontainer VS Code est fourni (inspiré de [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint), le modèle de référence pour le développement d'intégrations HA custom) :
+Les scripts de `scripts/` sont inspirés de [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint), le modèle de référence pour le développement d'intégrations HA custom. Ils se lancent dans un environnement virtuel Python 3.14 (Linux, macOS ou WSL) :
 
-1. Ouvrir le repo dans VS Code avec l'extension **Dev Containers**, puis "Reopen in Container" (installe `homeassistant` + dépendances via `scripts/setup`).
+1. Créer et activer un environnement virtuel (`python3 -m venv .venv && source .venv/bin/activate`), puis lancer `scripts/setup` (installe `homeassistant` + dépendances).
 2. Lancer `scripts/develop` — crée un dossier `config/` de dev (gitignored) et démarre Home Assistant avec l'intégration chargée, sur `http://localhost:8123`.
 3. Compléter le config flow avec un vrai compte Sunology Stream depuis l'UI.
 
