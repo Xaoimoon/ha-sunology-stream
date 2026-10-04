@@ -23,6 +23,10 @@ Intégration Home Assistant (non officielle) pour les panneaux solaires Sunology
 
 ### Via HACS (recommandé)
 
+[![Ouvrir le dépôt dans HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Xaoimoon&repository=ha-sunology-stream&category=integration)
+
+Cliquer sur le bouton ci-dessus, ou ajouter le dépôt à la main :
+
 1. Dans HACS, menu **⋮ > Dépôts personnalisés**, ajouter `https://github.com/Xaoimoon/ha-sunology-stream` avec le type **Intégration**.
 2. Rechercher "Sunology Stream" dans HACS, puis **Télécharger**.
 3. Redémarrer Home Assistant.
@@ -37,6 +41,10 @@ HACS vous proposera ensuite automatiquement les nouvelles versions.
 4. Redémarrer Home Assistant.
 
 ## Configuration
+
+[![Ajouter l'intégration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=sunology_stream)
+
+Cliquer sur le bouton ci-dessus, ou :
 
 1. **Paramètres > Appareils et services > Ajouter une intégration**.
 2. Chercher "Sunology Stream".
