@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-# Install common requirements (pip) first so any pip upgrade completes
-# before the rest of the dependencies are installed.
-python3 -m pip install --requirement requirements_common.txt
-python3 -m pip install --requirement requirements_dev.txt
+# Upgrade pip first so the rest of the dependencies install with a
+# recent resolver.
+python3 -m pip install --upgrade "pip>=21.3.1"
+python3 -m pip install homeassistant==2026.6.4 colorlog==6.10.1
