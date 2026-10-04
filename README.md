@@ -3,7 +3,7 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Installations actives](https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=41BDF5&label=Active%20installations&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.sunology_stream.total)](https://analytics.home-assistant.io/)
 [![Release](https://img.shields.io/github/v/release/Xaoimoon/ha-sunology-stream?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/releases)
-[![Licence](https://img.shields.io/github/license/Xaoimoon/ha-sunology-stream?style=for-the-badge)](LICENSE)
+[![Licence](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/blob/main/LICENSE)
 
 [![Maintenu](https://img.shields.io/badge/maintained-yes-green.svg?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/commits/main)
 [![Activité](https://img.shields.io/github/commit-activity/y/Xaoimoon/ha-sunology-stream?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/commits/main)
@@ -101,4 +101,4 @@ Le fonctionnement de l'API, l'environnement de développement, les tests et le p
 
 ## Licence
 
-MIT — voir [LICENSE](LICENSE).
+MIT — voir [LICENSE](https://github.com/Xaoimoon/ha-sunology-stream/blob/main/LICENSE).
