@@ -1,119 +1,87 @@
-# ha-sunology-stream
+# Sunology Stream pour Home Assistant
 
-Intégration Home Assistant (non officielle) pour les panneaux solaires et le lecteur TIC Sunology Stream, via l'API cloud `backend-mobile.stream.sunology.eu`.
+Intégration Home Assistant (non officielle) pour les panneaux solaires Sunology Stream et le lecteur TIC Linky. Elle affiche dans Home Assistant les mêmes informations que l'application Sunology Stream : production solaire, consommation du foyer, heures creuses et pleines, coûts et état des panneaux.
 
-## Statut
+## Fonctionnalités
 
-🚧 En développement — fonctionnel en usage basique (config flow, capteurs de puissance/énergie/ERL, consommation du jour en heures creuses/pleines et son coût, diagnostics par panneau : WiFi, firmware, dernière synchro, seuil et mode de la batterie), testé en conditions réelles via le devcontainer. Pas encore publié/packagé pour HACS.
-
-Les entités sont regroupées par appareil :
-- **Installation Sunology** (un par compte) : puissance de production totale, énergie produite du jour, taux d'autonomie ;
-- **Lecteur TIC Linky** (si le compte a un ERL) : puissances de consommation et d'achat au réseau, énergie consommée du jour, heures creuses/pleines, coûts, état et dernière synchro de l'ERL, en diagnostic le contrat saisi dans l'appli (PDL, offre, option tarifaire, puissance souscrite, heures creuses, fournisseur, gestionnaire de réseau), et les prix Selectra : prix heures creuses, prix heures pleines et prix actuel en EUR/kWh ;
-- **un appareil par panneau** (modèle, n° de série, firmware) : production, batterie, diagnostics.
-
-Le Lecteur TIC Linky et les panneaux sont reliés à l'Installation Sunology. Sans ERL, les capteurs de consommation restent sur l'appareil Installation Sunology.
-
-Un panneau ajouté dans l'appli Sunology apparaît tout seul, sans recharger l'intégration : ses entités sont créées dès qu'il figure dans l'overview (30 s), ses diagnostics dès que ses détails sont récupérés (rafraîchissement immédiat quand un nouveau panneau apparaît). Un panneau retiré de l'appli passe en « indisponible » ; son appareil peut alors être supprimé depuis sa fiche dans Home Assistant. Les appareils encore présents sur le compte ne peuvent pas être supprimés. Si un panneau supprimé de Home Assistant revient ensuite sur le compte, recharger l'intégration pour recréer ses entités.
-
-Les capteurs heures creuses/pleines ne sont créés que si le compte a un lecteur TIC (ERL) et un contrat HP/HC renseigné dans l'appli. Ils sont calculés par heure terminée, donc avec jusqu'à une heure de retard. Entre minuit et la fin de la première heure, ils affichent encore le total complet de la veille, tranche 23h-minuit comprise, puis repartent de zéro : aucune heure n'est perdue. Les coûts sont calculés avec les prix exacts de Selectra (kWh de chaque tarif × son prix) ; à défaut, avec les coûts horaires de l'API, dont les prix sont arrondis au centime. Les prix Selectra sont relus à leur date `next_update`, quand le contrat change dans l'appli, et au moins une fois par jour. Le « prix actuel » suit le calendrier de prix Selectra et peut servir d'« entité avec le prix actuel » dans le tableau de bord Énergie. Les capteurs de coût sont en `state_class: total` avec un `last_reset` sur le jour affiché, donc utilisables comme « entité suivant les coûts totaux » dans le tableau de bord Énergie.
-
-## Contexte
-
-L'application mobile Sunology Stream n'a pas d'API publique documentée. Les endpoints ci-dessous ont été identifiés par rétro-ingénierie du code JavaScript de l'application Android (Capacitor/Ionic), en septembre 2026.
-
-### Authentification
-
-Authentification par cookie de session (pas de token Bearer).
-
-- `POST /api/login-post` — body `{"username": "<email>", "password": "<mot de passe>"}`
-- `POST /api/logout`
-- `GET /api/users/me` — profil de l'utilisateur connecté (sert aussi de vérification de session)
-
-`/api/users/authenticated`, référencé dans le code JS de l'appli, n'existe pas côté serveur (404 confirmé).
-
-Base URL : `https://backend-mobile.stream.sunology.eu`
-
-### Endpoints de données
-
-- `GET/PUT /api/client` — profil client (flags `hasGridStreamMeter`, `hasErl`, `hasStorageBattery`)
-- `GET /api/devices/stations-and-storages`
-- `GET /api/devices/accessories`
-- `GET /api/stream-meter`
-- `GET /api/storage-battery/all-paired`, `GET /api/storage-battery/{id}`
-- `GET /api/solar-panels/{id}` — `id` = identifiant d'appareil (pas le numéro de série), obtenu via `/devices/stations-and-storages`. Renvoie `firmwareVersion`, `rssiWifi` (dBm), `lastSynchronizationDate`, `state`, `batteryThreshold` (seuil de déclenchement de la charge, 210-450 W) et `batteryPreserveEnergy` (option « nomade » : pas de décharge pendant 18 h).
-- `GET /api/erl`
-- `GET /api/irradiance[-forecast]`, `POST /api/irradiance/history`
-- `GET /api/history/{timeScale}/{date}?zone=` — `timeScale` : `DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`, `INFINITY`. Renvoie productions/consommations horaires du jour en Wh (`wattValueSuffix.value`) + équivalent monétaire (`currency`, basé sur `kwhRate` du profil client) + taux d'autonomie (`selfReliance`).
-- `GET /api/client/energyAmountsAndCostsForDay?zone=&day=` — `day` = minuit local en ISO UTC (`2026-09-25T22:00:00.000Z`). Par heure terminée (clé = heure UTC) : `consumptionInKWh`/`consumptionInEuros`, `productionInKWh`, `energySoldInKWh`, `dischargeInKWh`, et `priceCentsPerKWh` (tarif HC/HP du contrat, au prorata pour les heures à cheval sur un changement de tarif). Renvoie une 500 tant qu'aucune heure du jour n'est terminée (juste après minuit), puis les 24 heures du jour, à 0 pour celles qui ne sont pas terminées.
-- `GET /api/client/clientSignedContract` — contrat d'électricité saisi dans l'appli (Paramètres > Tarifs énergie). `config` : `pdl`, `offer_name`, `option_name`, `off_peak_hours` (plages d'heures creuses, coupées à minuit), `distributor_name`, et des identifiants (`power_id`, `provider_id`…) dont les libellés (« 9 kVA », « EDF »…) sont dans `questionsForSelectra.<champ>.options`.
-- `POST /api/selectra/planning/details` — corps : `config` du contrat. Fiche tarifaire Selectra : offre, option, `features` (prix au kWh par période, `key` « price kwh hc » / « price kwh hp », abonnement), heures creuses Enedis actuelles et à venir (`distributor_off_peak_hours`). Une lecture, que l'appli appelle à l'affichage des tarifs.
-- `POST /api/selectra/planning/prices` — corps : `config` du contrat. Calendrier des prix à venir (`prices` : `start`, `end`, `name`, `price`), `currency`, `next_update`.
-- `GET /api/client/electricityCosts?zone=` — cumuls achetés/produits/économisés en kWh et en euros.
-- `POST /api/overview`
-
-**Paramètre `zone`** : décalage UTC **en heures**, comme l'envoie l'appli (`-(new Date().getTimezoneOffset()) / 60`, soit `2` en heure d'été et `1` en hiver). `+02:00` est rejeté (400). `+0200` est accepté mais mal interprété : l'historique couvre alors plusieurs jours et la consommation est décalée d'environ 30 h, et `energyAmountsAndCostsForDay`/`electricityCosts` répondent 500.
-
-Avec le bon `zone`, la consommation horaire issue de la TIC correspond à la courbe de charge Enedis à ~0,1 % près par jour (vérifié sur 7 jours via MyElectricalData).
-
-Les formes JSON réelles ont été capturées avec `scripts/probe.py` contre un vrai compte (voir section Développement) — les réponses ne sont pas commitées (données personnelles) mais servent à valider le parsing des entités.
+- Production solaire en temps réel et énergie produite du jour, au total et par panneau.
+- Consommation du foyer et achat au réseau, si vous avez un lecteur TIC Linky.
+- Consommation du jour en heures creuses et heures pleines, et son coût.
+- Prix de l'électricité de votre contrat : heures creuses, heures pleines et prix actuel.
+- Batterie et état de chaque panneau : WiFi, firmware, dernière synchronisation, seuil de charge, mode nomade.
+- Compatible avec le tableau de bord Énergie de Home Assistant.
 
 ## Installation
 
-Manuelle uniquement (pas de HACS — ce dépôt est hébergé sur Forgejo, or HACS ne supporte que les dépôts GitHub, même en "dépôt personnalisé") :
+### Via HACS (recommandé)
 
-1. Repérer le dossier de configuration de votre installation Home Assistant (celui qui contient `configuration.yaml`).
+1. Dans HACS, menu **⋮ > Dépôts personnalisés**, ajouter `https://github.com/Xaoimoon/ha-sunology-stream` avec le type **Intégration**.
+2. Rechercher "Sunology Stream" dans HACS, puis **Télécharger**.
+3. Redémarrer Home Assistant.
+
+HACS vous proposera ensuite automatiquement les nouvelles versions.
+
+### Manuelle
+
+1. Repérer le dossier de configuration de Home Assistant (celui qui contient `configuration.yaml`).
 2. Y créer un dossier `custom_components` s'il n'existe pas déjà.
 3. Copier le dossier `custom_components/sunology_stream` de ce dépôt dedans, pour obtenir `<config>/custom_components/sunology_stream/`.
-4. Redémarrer Home Assistant (obligatoire — les intégrations custom ne sont chargées qu'au démarrage).
-5. **Paramètres > Appareils et services > Ajouter une intégration**, chercher "Sunology Stream", et se connecter avec son compte.
+4. Redémarrer Home Assistant.
 
-Si l'intégration n'apparaît pas dans la recherche après redémarrage, vérifier les logs (**Paramètres > Système > Journaux**) pour une erreur de chargement — le cas le plus probable est une version de Home Assistant trop ancienne (l'intégration utilise le pattern `entry.runtime_data`, disponible depuis HA 2024.6).
+## Configuration
 
-## Développement
+1. **Paramètres > Appareils et services > Ajouter une intégration**.
+2. Chercher "Sunology Stream".
+3. Se connecter avec l'e-mail et le mot de passe du compte de l'application Sunology Stream.
 
-Un devcontainer VS Code est fourni (inspiré de [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint), le modèle de référence pour le développement d'intégrations HA custom) :
+Home Assistant Core 2024.6 ou plus récent est requis. Si l'intégration n'apparaît pas dans la recherche, consulter **Paramètres > Système > Journaux** : la cause la plus probable est une version de Home Assistant trop ancienne.
 
-1. Ouvrir le repo dans VS Code avec l'extension **Dev Containers**, puis "Reopen in Container" (installe `homeassistant` + dépendances via `scripts/setup`).
-2. Lancer `scripts/develop` — crée un dossier `config/` de dev (gitignored) et démarre Home Assistant avec l'intégration chargée, sur `http://localhost:8123`.
-3. Compléter le config flow avec un vrai compte Sunology Stream depuis l'UI.
+## Appareils et entités
 
-Pour capturer/rafraîchir les vraies formes de réponse API (hors HA, script autonome) :
+L'intégration crée trois types d'appareils :
 
-```bash
-cp .env.example .env   # renseigner SUNOLOGY_USERNAME / SUNOLOGY_PASSWORD
-python scripts/probe.py
-```
+- **Installation Sunology** (un par compte) : puissance de production totale, énergie produite du jour, taux d'autonomie.
+- **Lecteur TIC Linky** (si vous en avez un) :
+  - puissance consommée et puissance achetée au réseau ;
+  - énergie consommée du jour, dont heures creuses et heures pleines, et leur coût ;
+  - prix heures creuses, heures pleines et prix actuel, en €/kWh ;
+  - état et dernière synchronisation du lecteur ;
+  - en diagnostic, le contrat renseigné dans l'application : PDL, offre, option tarifaire, puissance souscrite, plages d'heures creuses, fournisseur, gestionnaire de réseau.
+- **Un appareil par panneau** (modèle, n° de série, firmware) : production, batterie et diagnostics.
 
-Les réponses sont sauvegardées dans `dev/fixtures/` (gitignored, contient des données personnelles).
+Le lecteur TIC Linky et les panneaux sont rattachés à l'appareil Installation Sunology. Sans lecteur TIC Linky, les capteurs de consommation sont placés sur l'appareil Installation Sunology.
 
-### Tests
+## Bon à savoir
 
-```bash
-scripts/test
-```
+### Heures creuses et heures pleines
 
-Suite pytest ciblée (pas de couverture exhaustive façon HA core) : `api.py` (logique HTTP/retry/erreurs, mockée avec `aioresponses`, aucun appel réseau réel) et l'extraction de données du coordinator/sensor, testée contre des fixtures réelles anonymisées (`tests/fixtures/`, dérivées de captures `scripts/probe.py` avec les données personnelles retirées). Pas de tests sur `config_flow.py` — nécessiterait `pytest-homeassistant-custom-component`, jugé disproportionné pour ce projet (la version actuelle de ludeeus/integration_blueprint a d'ailleurs abandonné cette approche).
+- Ces capteurs n'apparaissent que si vous avez un lecteur TIC Linky **et** un contrat heures creuses / heures pleines renseigné dans l'application Sunology (**Paramètres > Tarifs énergie**).
+- Ils sont mis à jour à la fin de chaque heure, donc avec jusqu'à une heure de retard.
+- Entre minuit et 1 h, ils affichent encore le total de la veille, puis repartent de zéro. Aucune heure n'est perdue.
+- Les coûts utilisent les prix de votre contrat, comme dans l'application, et suivent leurs changements.
 
-### Releases
+### Tableau de bord Énergie
 
-Le versioning (`manifest.json`) suit [SemVer](https://semver.org/) et est bumpé automatiquement par `.forgejo/workflows/release.yml` à chaque push sur `main`, à partir des messages de commit [Conventional Commits](https://www.conventionalcommits.org/) :
+- Les capteurs de coût peuvent servir d'**entité suivant les coûts totaux**.
+- Le capteur **Prix actuel** peut servir d'**entité avec le prix actuel**.
 
-- `feat: ...` → minor
-- `fix: ...` / `perf: ...` → patch
-- `BREAKING CHANGE:` en pied de message, ou `!` avant le `:` (ex. `feat!: ...`) → major
-- tout le reste (`docs:`, `chore:`, `refactor:`, `test:`, ...) ne déclenche pas de release
+### Ajout et retrait de panneaux
 
-Le workflow calcule la version suivante (`scripts/bump_version.py`), met à jour `manifest.json`, commit (`chore(release): vX.Y.Z`, avec un garde-fou pour ne pas se re-déclencher lui-même), tag, et crée une release Forgejo via l'API (`scripts/create_release.py`). Prérequis côté instance : un runner Forgejo Actions enregistré, avec le token par défaut autorisé en écriture sur le dépôt (`permissions: contents: write`).
+- Un panneau ajouté dans l'application Sunology apparaît tout seul dans Home Assistant, en moins d'une minute, sans redémarrage.
+- Un panneau retiré de l'application passe en « indisponible ». Vous pouvez alors supprimer son appareil depuis sa fiche dans Home Assistant. Les panneaux encore présents sur le compte ne peuvent pas être supprimés.
+- Si un panneau supprimé de Home Assistant revient ensuite sur le compte, recharger l'intégration pour le faire réapparaître.
 
-Prévisualiser la prochaine version sans rien modifier :
+### Connexion internet
 
-```bash
-python scripts/bump_version.py --dry-run
-```
+Les données passent par le cloud Sunology : l'intégration a besoin d'internet, et les valeurs sont celles que l'application affiche.
 
 ## Avertissement
 
-Projet non affilié à Sunology. Basé sur une API non documentée susceptible de changer sans préavis.
+Projet non affilié à Sunology. L'intégration repose sur une API non documentée qui peut changer sans préavis.
+
+## Pour les développeurs
+
+Le fonctionnement de l'API, l'environnement de développement, les tests et le processus de release sont décrits dans [TECHNIQUE.md](https://github.com/Xaoimoon/ha-sunology-stream/blob/main/TECHNIQUE.md).
 
 ## Licence
 
