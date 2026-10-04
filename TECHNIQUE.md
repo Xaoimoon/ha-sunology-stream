@@ -81,14 +81,14 @@ Suite pytest ciblée (pas de couverture exhaustive façon HA core) : `api.py` (l
 
 ## Releases
 
-Le versioning (`manifest.json`) suit [SemVer](https://semver.org/) et est bumpé automatiquement par `.forgejo/workflows/release.yml` à chaque push sur `main`, à partir des messages de commit [Conventional Commits](https://www.conventionalcommits.org/) :
+Le versioning (`manifest.json`) suit [SemVer](https://semver.org/) et est bumpé automatiquement à chaque push sur `main`, à partir des messages de commit [Conventional Commits](https://www.conventionalcommits.org/) :
 
 - `feat: ...` → minor
 - `fix: ...` / `perf: ...` → patch
 - `BREAKING CHANGE:` en pied de message, ou `!` avant le `:` (ex. `feat!: ...`) → major
 - tout le reste (`docs:`, `chore:`, `refactor:`, `test:`, ...) ne déclenche pas de release
 
-Le workflow calcule la version suivante (`scripts/bump_version.py`), met à jour `manifest.json`, commit (`chore(release): vX.Y.Z`, avec un garde-fou pour ne pas se re-déclencher lui-même), tag, et crée une release Forgejo via l'API (`scripts/create_release.py`). Prérequis côté instance : un runner Forgejo Actions enregistré, avec le token par défaut autorisé en écriture sur le dépôt (`permissions: contents: write`).
+`scripts/bump_version.py` calcule la version suivante et met à jour `manifest.json`. La CI commit ensuite (`chore(release): vX.Y.Z`, avec un garde-fou pour ne pas se re-déclencher elle-même) et pose le tag.
 
 Prévisualiser la prochaine version sans rien modifier :
 
@@ -96,11 +96,8 @@ Prévisualiser la prochaine version sans rien modifier :
 python scripts/bump_version.py --dry-run
 ```
 
-### Miroir GitHub et HACS
+### Releases GitHub et HACS
 
-Le dépôt principal est sur Forgejo (`brokk.xaoimoon.fr`) ; [github.com/Xaoimoon/ha-sunology-stream](https://github.com/Xaoimoon/ha-sunology-stream) en est un miroir (push mirror Forgejo), nécessaire parce que HACS ne supporte que GitHub.
-
-- Le miroir reçoit les commits et les tags, puis `.github/workflows/release.yml` crée une GitHub Release pour chaque tag `vX.Y.Z` : HACS s'appuie sur les releases et ignore les tags seuls.
-- Forgejo ignore `.github/workflows` tant que `.forgejo/workflows` existe.
-- GitHub ne déclenche aucun workflow quand plus de trois tags sont poussés d'un coup (cas de la première synchro du miroir) : créer alors les releases manquantes à la main, via **Actions > GitHub Release > Run workflow** avec le tag.
+- HACS installe depuis les GitHub Releases et ignore les tags seuls : `.github/workflows/release.yml` crée une release pour chaque tag `vX.Y.Z`, avec en notes les commits depuis le tag précédent.
+- GitHub ne déclenche aucun workflow quand plus de trois tags sont poussés d'un coup : créer alors les releases manquantes à la main, via **Actions > GitHub Release > Run workflow** avec le tag.
 - `hacs.json` déclare le nom affiché dans HACS et la version minimale de Home Assistant.
