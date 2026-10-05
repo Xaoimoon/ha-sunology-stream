@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from .api import (
@@ -17,7 +18,7 @@ from .api import (
 )
 from .const import DOMAIN
 from .coordinator import SunologyStreamDataUpdateCoordinator
-from .entity import live_device_identifiers
+from .entity import installation_device_info, live_device_identifiers
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -28,6 +29,9 @@ class SunologyStreamRuntimeData:
 
     api: SunologyStreamApiClient
     coordinator: SunologyStreamDataUpdateCoordinator
+    # Device registry id of the installation device, which the ERL and the
+    # panels link to (`via_device_id`).
+    installation_device_id: str
 
 
 type SunologyStreamConfigEntry = ConfigEntry[SunologyStreamRuntimeData]
@@ -55,7 +59,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: SunologyStreamConfigEntr
         await api.close()
         raise
 
-    entry.runtime_data = SunologyStreamRuntimeData(api=api, coordinator=coordinator)
+    # Registered before the platforms: the ERL and panel devices need its id.
+    installation = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id, **installation_device_info(entry.entry_id)
+    )
+
+    entry.runtime_data = SunologyStreamRuntimeData(
+        api=api, coordinator=coordinator, installation_device_id=installation.id
+    )
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 

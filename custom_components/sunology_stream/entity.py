@@ -4,7 +4,8 @@ Entities are grouped into three kinds of devices:
 - the installation (one per account), a service device;
 - the ERL (Linky TIC reader), when the account has one;
 - one device per solar panel.
-The ERL and the panels are linked to the installation via `via_device`.
+The ERL and the panels are linked to the installation via `via_device_id`,
+the device registry id of the installation (registered in `async_setup_entry`).
 """
 
 from __future__ import annotations
@@ -51,7 +52,9 @@ def installation_device_info(entry_id: str) -> DeviceInfo:
     )
 
 
-def erl_device_info(entry_id: str, erl: dict[str, Any]) -> DeviceInfo:
+def erl_device_info(
+    entry_id: str, erl: dict[str, Any], installation_device_id: str
+) -> DeviceInfo:
     """The ERL (Linky TIC reader), for grid consumption sensors."""
     return DeviceInfo(
         identifiers={(DOMAIN, erl_identifier(entry_id, erl))},
@@ -60,15 +63,15 @@ def erl_device_info(entry_id: str, erl: dict[str, Any]) -> DeviceInfo:
         model=erl.get("erlType") or "ERL",
         serial_number=erl.get("serialNumber"),
         sw_version=erl.get("firmwareVersion"),
-        via_device=(DOMAIN, entry_id),
+        via_device_id=installation_device_id,
     )
 
 
 def panel_device_info(
-    entry_id: str,
     serial_number: str,
     panel_data: dict[str, Any],
     details: dict[str, Any] | None,
+    installation_device_id: str,
 ) -> DeviceInfo:
     """One solar panel, keyed by its serial number.
 
@@ -83,7 +86,7 @@ def panel_device_info(
         model=panel_data.get("panelType"),
         serial_number=serial_number,
         sw_version=(details or {}).get("firmwareVersion"),
-        via_device=(DOMAIN, entry_id),
+        via_device_id=installation_device_id,
     )
 
 
@@ -148,7 +151,12 @@ def async_track_panels(
         new_entities: list[Entity] = []
         for serial_number, panel_data in overview_panels(data).items():
             details = data.panel_details.get(serial_number)
-            device = panel_device_info(entry.entry_id, serial_number, panel_data, details)
+            device = panel_device_info(
+                serial_number,
+                panel_data,
+                details,
+                entry.runtime_data.installation_device_id,
+            )
             if serial_number not in with_entities:
                 with_entities.add(serial_number)
                 new_entities.extend(build_panel_entities(serial_number, panel_data, device))
