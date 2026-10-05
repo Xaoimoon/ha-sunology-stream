@@ -10,7 +10,7 @@ Détails d'implémentation, API Sunology Stream, développement et releases de l
 - **Coûts** : kWh de chaque tarif × prix unitaire Selectra (`/selectra/planning/details`). À défaut, l'intégration utilise les coûts horaires de l'API, dont les prix sont arrondis au centime.
 - **Rafraîchissement des prix Selectra** : à leur date `next_update`, quand le contrat change dans l'appli, et au moins une fois par jour.
 - **Tableau de bord Énergie** : les capteurs de coût sont en `state_class: total` avec un `last_reset` sur le jour affiché. Le « prix actuel » suit le calendrier `/selectra/planning/prices`.
-- **Version minimale de Home Assistant** : 2024.6, pour le pattern `entry.runtime_data` (déclarée dans `hacs.json`). Testé sur 2026.6.
+- **Version minimale de Home Assistant** : 2026.8, pour `via_device_id` dans `DeviceInfo` (le paramètre `via_device` est déprécié et cesse de fonctionner en 2027.8) ; déclarée dans `hacs.json`. Testé sur 2026.9.
 
 ## API Sunology Stream
 

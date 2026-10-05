@@ -57,6 +57,7 @@ class FakePlatform:
         self.platform = platform
         self.entry = MagicMock()
         self.entry.entry_id = "entry"
+        self.entry.runtime_data.installation_device_id = "installation_device_id"
         self.coordinator = self.entry.runtime_data.coordinator
         self.coordinator.data = data
         self.coordinator.last_update_success = True
@@ -97,33 +98,35 @@ def test_installation_device():
 
 
 def test_erl_device():
-    info = erl_device_info("entry", load_fixture("erl"))
+    info = erl_device_info("entry", load_fixture("erl"), "installation_device_id")
     assert info["identifiers"] == {(DOMAIN, "000000000000")}
     assert info["model"] == "ERL"
     assert info["serial_number"] == "000000000000"
-    assert info["via_device"] == (DOMAIN, "entry")
+    assert info["via_device_id"] == "installation_device_id"
+    assert "via_device" not in info
 
 
 def test_erl_device_without_serial_number():
-    assert erl_device_info("entry", {})["identifiers"] == {(DOMAIN, "entry_erl")}
+    assert erl_device_info("entry", {}, "installation_device_id")["identifiers"] == {(DOMAIN, "entry_erl")}
 
 
 def test_panel_device():
     info = panel_device_info(
-        "entry",
         "AAAAAAAAAAAA",
         {"surname": "Sunology 1", "panelType": "PLAY_MAX"},
         load_fixture("solar-panel"),
+        "installation_device_id",
     )
     assert info["identifiers"] == {(DOMAIN, "AAAAAAAAAAAA")}
     assert info["name"] == "Sunology 1"
     assert info["model"] == "PLAY_MAX"
     assert info["sw_version"] == "202624.2"
-    assert info["via_device"] == (DOMAIN, "entry")
+    assert info["via_device_id"] == "installation_device_id"
+    assert "via_device" not in info
 
 
 def test_panel_device_without_details_or_surname():
-    info = panel_device_info("entry", "AAAAAAAAAAAA", {}, None)
+    info = panel_device_info("AAAAAAAAAAAA", {}, None, "installation_device_id")
     assert info["name"] == "AAAAAAAAAAAA"
     assert info["sw_version"] is None
 

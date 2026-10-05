@@ -50,7 +50,7 @@ Cliquer sur le bouton ci-dessus, ou :
 2. Chercher "Sunology Stream".
 3. Se connecter avec l'e-mail et le mot de passe du compte de l'application Sunology Stream.
 
-Home Assistant Core 2024.6 ou plus récent est requis. Si l'intégration n'apparaît pas dans la recherche, consulter **Paramètres > Système > Journaux** : la cause la plus probable est une version de Home Assistant trop ancienne.
+Home Assistant Core 2026.8 ou plus récent est requis. Si l'intégration n'apparaît pas dans la recherche, consulter **Paramètres > Système > Journaux** : la cause la plus probable est une version de Home Assistant trop ancienne.
 
 ## Appareils et entités
 

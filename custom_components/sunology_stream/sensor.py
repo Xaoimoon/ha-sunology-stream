@@ -514,7 +514,11 @@ async def async_setup_entry(
 
     installation = installation_device_info(entry.entry_id)
     erl_device = (
-        erl_device_info(entry.entry_id, coordinator.data.erl)
+        erl_device_info(
+            entry.entry_id,
+            coordinator.data.erl,
+            entry.runtime_data.installation_device_id,
+        )
         if coordinator.data.erl
         else installation
     )

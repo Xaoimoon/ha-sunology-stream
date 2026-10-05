@@ -31,7 +31,13 @@ async def async_setup_entry(
     if coordinator.data.erl:
         entities.append(
             SunologyStreamErlConnectedBinarySensor(
-                coordinator, entry.entry_id, erl_device_info(entry.entry_id, coordinator.data.erl)
+                coordinator,
+                entry.entry_id,
+                erl_device_info(
+                    entry.entry_id,
+                    coordinator.data.erl,
+                    entry.runtime_data.installation_device_id,
+                ),
             )
         )
 
