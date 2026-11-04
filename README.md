@@ -99,10 +99,6 @@ Data goes through the Sunology cloud: the integration needs Internet access, and
 
 This project is not affiliated with Sunology. The integration relies on an undocumented API that may change without notice.
 
-## For developers
-
-How the API works, the development environment, the tests and the release process are described in [TECHNIQUE.md](https://github.com/Xaoimoon/ha-sunology-stream/blob/main/TECHNIQUE.md) (in French).
-
 ## License
 
 MIT — see [LICENSE](https://github.com/Xaoimoon/ha-sunology-stream/blob/main/LICENSE).

@@ -10,3 +10,5 @@ venv/
 dev/fixtures/
 config/
 release_notes.md
+# Notes techniques gardées en local
+TECHNIQUE.md
