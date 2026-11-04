@@ -7,6 +7,9 @@
 
 [![Maintenu](https://img.shields.io/badge/maintained-yes-green.svg?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/commits/main)
 [![Activité](https://img.shields.io/github/commit-activity/y/Xaoimoon/ha-sunology-stream?style=for-the-badge)](https://github.com/Xaoimoon/ha-sunology-stream/commits/main)
+[![Discussions](https://img.shields.io/github/discussions/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=7289DA)](https://github.com/Xaoimoon/ha-sunology-stream/discussions)
+[![Issues](https://img.shields.io/github/issues/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=E05D44)](https://github.com/Xaoimoon/ha-sunology-stream/issues)
+[![Stars](https://img.shields.io/github/stars/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=DFB317)](https://github.com/Xaoimoon/ha-sunology-stream/stargazers)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-support-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/xaoimoon)
 
 Intégration Home Assistant (non officielle) pour les panneaux solaires Sunology Stream et le lecteur TIC Linky. Elle affiche dans Home Assistant les mêmes informations que l'application Sunology Stream : production solaire, consommation du foyer, heures creuses et pleines, coûts et état des panneaux.
