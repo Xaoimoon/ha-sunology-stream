@@ -10,7 +10,8 @@
 [![Discussions](https://img.shields.io/github/discussions/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=7289DA)](https://github.com/Xaoimoon/ha-sunology-stream/discussions)
 [![Issues](https://img.shields.io/github/issues/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=E05D44)](https://github.com/Xaoimoon/ha-sunology-stream/issues)
 [![Stars](https://img.shields.io/github/stars/Xaoimoon/ha-sunology-stream?style=for-the-badge&logo=github&color=DFB317)](https://github.com/Xaoimoon/ha-sunology-stream/stargazers)
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-support-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/xaoimoon)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F6Z42A2W0S)
 
 Unofficial Home Assistant integration for Sunology Stream solar panels and the Linky TIC reader. It shows in Home Assistant the same information as the Sunology Stream app: solar production, household consumption, off-peak and peak hours, costs and panel status.
 
